@@ -36,7 +36,7 @@ input,textarea{font-family:'Inter',system-ui,sans-serif}
 <div id="root"></div>
 <div id="err"></div>
 <script>
-window.onerror=function(m,s,l,c,e){var d=document.getElementById("err");if(d){d.style.display="block";d.textContent="Error:\n"+m+"\n"+(e&&e.stack?e.stack:"");}return false;};
+window.onerror=function(m,s,l,c,e){if(/^Script error\.?$/i.test(String(m))||(s&&s.indexOf(location.origin)!==0))return true;var d=document.getElementById("err");if(d){d.style.display="block";d.textContent="Error:\n"+m+"\n"+(e&&e.stack?e.stack:"");}return false;};
 try{
 // ═══ BACKYARD ULTRA · BRIGHTON · 8 MAY 2027 · DATA ═══════════════════════════
 const START = new Date("2026-11-30T00:00:00");
@@ -64,28 +64,28 @@ const phOf=w=>PHASES.find(p=>p.weeks.includes(w)).id;
 // ── week table ──
 const RPE={found:"RPE 7",build:"RPE 7–8",heavy:"RPE 8",maint:"RPE 8",deload:"RPE 6",taper:"RPE 6"};
 const WK={
- 1:{h:"Week 1 — Foundation",str:"found",hl:32,thu:20,tue:{n:"800m repeats",s:"6×800m",note:"@ {I} · 90s jog",km:8},sat:{t:"long",km:14},sun:{t:"z2",km:6,opt:true}},
- 2:{h:"Week 2 — Settle In",str:"found",hl:32,thu:20,tue:{n:"Tempo intervals",s:"3×2km",note:"@ {T} · 90s jog",km:9},sat:{t:"long",km:15},sun:{t:"z2",km:6,opt:true}},
- 3:{h:"Week 3 — Load",str:"found",hl:36,thu:20,tue:{n:"800m repeats",s:"8×800m",note:"@ {I} · 90s jog",km:10},sat:{t:"long",km:16},sun:{t:"z2",km:8}},
- 4:{h:"Week 4 — Christmas Deload 🎄",str:"deload",hl:24,thu:20,tue:{n:"Hill sprints",s:"8×60s",note:"Hard uphill (~{R} effort) · jog back down",km:7},sat:{t:"long",km:12},sun:{t:"z2",km:5,opt:true}},
- 5:{h:"Week 5 — Build",str:"build",hl:36,thu:20,tue:{n:"1km repeats",s:"5×1km",note:"@ {I} · 2 min jog",km:9},sat:{t:"long",km:17},sun:{t:"z2",km:8}},
- 6:{h:"Week 6 — Build",str:"build",hl:40,thu:20,tue:{n:"Tempo",s:"20 min",note:"@ {T} · steady, not a race",km:8},sat:{t:"long",km:18,ff:true},sun:{t:"z2",km:8}},
- 7:{h:"Week 7 — Build Peak",str:"build",hl:40,thu:25,tue:{n:"1km repeats",s:"6×1km",note:"@ {I} · 90s jog",km:10},sat:{t:"long",km:20},sun:{t:"z2",km:10}},
- 8:{h:"Week 8 — Deload",str:"deload",hl:24,thu:20,tue:{n:"400m repeats",s:"6×400m",note:"@ {R} · 90s jog",km:7},sat:{t:"long",km:14},sun:{t:"z2",km:6,opt:true}},
- 9:{h:"Week 9 — Speed Block",str:"heavy",hl:40,thu:25,tue:{n:"1.2km repeats",s:"5×1.2km",note:"@ {I} · 2 min jog",km:10},sat:{t:"long",km:21},sun:{t:"z2",km:8}},
- 10:{h:"Week 10 — Speed Block",str:"heavy",hl:40,thu:25,tue:{n:"Cruise tempo",s:"2×15 min",note:"@ {T} · 3 min jog",km:10},sat:{t:"long",km:23,ff:true},sun:{t:"z2",km:10}},
- 11:{h:"Week 11 — Speed Peak",str:"heavy",hl:40,thu:25,tue:{n:"Threshold + speed",s:"3×(1.6km + 400m)",note:"1.6km @ {T} → straight into 400m @ {R} · 2 min jog",km:11},sat:{t:"long",km:25},sun:{t:"z2",km:8}},
- 12:{h:"Week 12 — Time Trial 🎯",str:"deload",hl:24,thu:20,tue:{n:"Openers",s:"5×400m",note:"@ {R} · full recovery",km:6},sat:{t:"tt",km:21.1},sun:{t:"z2",km:5,opt:true}},
- 13:{h:"Week 13 — First Yards",str:"maint",hl:30,thu:30,tue:{n:"Tempo",s:"25 min",note:"@ {T}",km:9},sat:{t:"yards",y:4},sun:{t:"z2",km:8}},
- 14:{h:"Week 14 — Ultra Build",str:"maint",hl:30,thu:30,tue:{n:"1km repeats",s:"6×1km",note:"@ {I} · 75s jog",km:10},sat:{t:"long",km:28,ff:true},sun:{t:"b2b",y:1}},
- 15:{h:"Week 15 — Five Yards",str:"maint",hl:30,thu:30,tue:{n:"Long tempo",s:"3×3km",note:"@ {T} · 2 min jog",km:12},sat:{t:"yards",y:5},sun:{t:"z2",km:8}},
- 16:{h:"Week 16 — Back-to-Back",str:"maint",hl:30,thu:30,tue:{n:"Hill repeats",s:"10×400m uphill",note:"Strong (~{I} effort) · jog down",km:9},sat:{t:"long",km:24},sun:{t:"b2b",y:2}},
+ 1:{h:"Week 1 — Foundation",str:"found",hl:32,thu:20,tue:{n:"800m repeats",s:"6×800m",note:"@ {I} · 90s jog",km:8,tm:32},sat:{t:"long",km:14},sun:{t:"z2",km:6,opt:true}},
+ 2:{h:"Week 2 — Settle In",str:"found",hl:32,thu:20,tue:{n:"Tempo intervals",s:"3×2km",note:"@ {T} · 90s jog",km:9,tm:37},sat:{t:"long",km:15},sun:{t:"z2",km:6,opt:true}},
+ 3:{h:"Week 3 — Load",str:"found",hl:36,thu:20,tue:{n:"800m repeats",s:"8×800m",note:"@ {I} · 90s jog",km:10,tm:43},sat:{t:"long",km:16},sun:{t:"z2",km:8}},
+ 4:{h:"Week 4 — Christmas Deload 🎄",str:"deload",hl:24,thu:20,tue:{n:"Hill sprints",s:"8×60s",note:"Hard uphill (~{R} effort) · jog back down",km:7,tm:24},sat:{t:"long",km:12},sun:{t:"z2",km:5,opt:true}},
+ 5:{h:"Week 5 — Build",str:"build",hl:36,thu:20,tue:{n:"1km repeats",s:"5×1km",note:"@ {I} · 2 min jog",km:9,tm:34},sat:{t:"long",km:17},sun:{t:"z2",km:8}},
+ 6:{h:"Week 6 — Build",str:"build",hl:40,thu:20,tue:{n:"Tempo",s:"20 min",note:"@ {T} · steady, not a race",km:8,tm:20},sat:{t:"long",km:18,ff:true},sun:{t:"z2",km:8}},
+ 7:{h:"Week 7 — Build Peak",str:"build",hl:40,thu:25,tue:{n:"1km repeats",s:"6×1km",note:"@ {I} · 90s jog",km:10,tm:38},sat:{t:"long",km:20},sun:{t:"z2",km:10}},
+ 8:{h:"Week 8 — Deload",str:"deload",hl:24,thu:20,tue:{n:"400m repeats",s:"6×400m",note:"@ {R} · 90s jog",km:7,tm:20},sat:{t:"long",km:14},sun:{t:"z2",km:6,opt:true}},
+ 9:{h:"Week 9 — Speed Block",str:"heavy",hl:40,thu:25,tue:{n:"1.2km repeats",s:"5×1.2km",note:"@ {I} · 2 min jog",km:10,tm:39},sat:{t:"long",km:21},sun:{t:"z2",km:8}},
+ 10:{h:"Week 10 — Speed Block",str:"heavy",hl:40,thu:25,tue:{n:"Cruise tempo",s:"2×15 min",note:"@ {T} · 3 min jog",km:10,tm:33},sat:{t:"long",km:23,ff:true},sun:{t:"z2",km:10}},
+ 11:{h:"Week 11 — Speed Peak",str:"heavy",hl:40,thu:25,tue:{n:"Threshold + speed",s:"3×(1.6km + 400m)",note:"1.6km @ {T} → straight into 400m @ {R} · 2 min jog",km:11,tm:37},sat:{t:"long",km:25},sun:{t:"z2",km:8}},
+ 12:{h:"Week 12 — Time Trial 🎯",str:"deload",hl:24,thu:20,tue:{n:"Openers",s:"5×400m",note:"@ {R} · full recovery",km:6,tm:15},sat:{t:"tt",km:21.1},sun:{t:"z2",km:5,opt:true}},
+ 13:{h:"Week 13 — First Yards",str:"maint",hl:30,thu:30,tue:{n:"Tempo",s:"25 min",note:"@ {T}",km:9,tm:25},sat:{t:"yards",y:4},sun:{t:"z2",km:8}},
+ 14:{h:"Week 14 — Ultra Build",str:"maint",hl:30,thu:30,tue:{n:"1km repeats",s:"6×1km",note:"@ {I} · 75s jog",km:10,tm:37},sat:{t:"long",km:28,ff:true},sun:{t:"b2b",y:1}},
+ 15:{h:"Week 15 — Five Yards",str:"maint",hl:30,thu:30,tue:{n:"Long tempo",s:"2×3km",note:"@ {T} · 2 min jog",km:10,tm:36},sat:{t:"yards",y:5},sun:{t:"z2",km:8}},
+ 16:{h:"Week 16 — Back-to-Back",str:"maint",hl:30,thu:30,tue:{n:"Hill repeats",s:"8×400m uphill",note:"Strong (~{I} effort) · jog down",km:8,tm:36},sat:{t:"long",km:24},sun:{t:"b2b",y:2}},
  17:{h:"Week 17 — Maldives 🌴",str:"maint",special:true},
  18:{h:"Week 18 — Re-entry",str:"maint",special:true},
- 19:{h:"Week 19 — Peak Build",str:"maint",hl:30,thu:30,tue:{n:"1km repeats",s:"5×1km",note:"@ {I} · 90s jog",km:9},sat:{t:"yards",y:4},sun:{t:"b2b",y:2}},
- 20:{h:"Week 20 — PEAK SIM 🔥",str:"maint",hl:24,thu:20,tue:{n:"Tempo",s:"20 min",note:"@ {T}",km:8},sat:{t:"yards",y:6,peak:true},sun:{t:"walk"}},
- 21:{h:"Week 21 — Absorb",str:"maint",hl:24,thu:25,tue:{n:"800m repeats",s:"6×800m",note:"@ {I} · 90s jog",km:9},sat:{t:"long",km:21},sun:{t:"z2",km:10}},
- 22:{h:"Week 22 — Taper",str:"taper",hl:20,thu:20,tue:{n:"Tempo intervals",s:"4×1km",note:"@ {T} · 90s jog",km:7},sat:{t:"long",km:13},sun:{t:"z2",km:6}},
+ 19:{h:"Week 19 — Peak Build",str:"maint",hl:30,thu:30,tue:{n:"1km repeats",s:"5×1km",note:"@ {I} · 90s jog",km:9,tm:34},sat:{t:"yards",y:4},sun:{t:"b2b",y:2}},
+ 20:{h:"Week 20 — PEAK SIM 🔥",str:"maint",hl:24,thu:20,tue:{n:"Tempo",s:"20 min",note:"@ {T}",km:8,tm:20},sat:{t:"yards",y:6,peak:true},sun:{t:"walk"}},
+ 21:{h:"Week 21 — Absorb",str:"maint",hl:24,thu:25,tue:{n:"800m repeats",s:"6×800m",note:"@ {I} · 90s jog",km:9,tm:32},sat:{t:"long",km:21},sun:{t:"z2",km:10}},
+ 22:{h:"Week 22 — Taper",str:"taper",hl:20,thu:20,tue:{n:"Tempo intervals",s:"4×1km",note:"@ {T} · 90s jog",km:7,tm:28},sat:{t:"long",km:13},sun:{t:"z2",km:6}},
  23:{h:"Race Week 🏁",str:"taper",special:true},
 };
 const wNote=w=>({h:WK[w].h,rpe:w===23?"Fresh":w===17?"Light":RPE[WK[w].str]});
@@ -128,53 +128,104 @@ const SA={
  taper:{sq:"2×5",rdl:"2×6",bss:"1×8/leg",su:null,calf:"2×12",fin:null,rest:"2 min"}};
 const LIFTNOTE={found:"RPE 7 · 2 reps in the tank",build:"RPE 7–8 · add load when every rep is clean",heavy:"RPE 8–9 · heaviest block of the year",maint:"Keep it heavy, cut the volume — this is what protects your muscle",deload:"~70% of working weight · crisp reps",taper:"Light · just keep the pattern"};
 
-function strA(lv){ const s=SA[lv], dl=lv==="deload"||lv==="taper";
+// ── exercise rotation: main lifts change by phase, accessories/core/finishers rotate weekly ──
+const PH=w=>Math.min(phOf(w),5); // phases 5+6 share a menu
+const ROT=(arr,w)=>arr[(w-1)%arr.length];
+const LOWER={
+ 1:{sq:["Back squat","Full depth · brace hard"],hg:["Romanian deadlift","Hinge, soft knees, bar close"],
+    acc:[[["Bulgarian split squat","DBs · front knee tracks toes"],["Weighted step-up","Box at knee height · drive through heel"]],
+         [["Reverse lunge (DB)","Step back, long stride · knee kisses floor"],["Lateral lunge (DB)","Sit into the hip · chest up"]]]},
+ 2:{sq:["Front squat","Elbows high · upright torso"],hg:["Trap-bar deadlift","Push the floor away"],
+    acc:[[["Walking lunge (DB)","Long steps · no wobble"],["Single-leg box squat","Control down · tap and stand"]],
+         [["Bulgarian split squat","DBs · pause 1s at the bottom"],["Step-down (eccentric)","3s lower · runner's knee insurance"]]]},
+ 3:{sq:["Back squat — heavy","Heaviest of the year · full rest"],hg:["Conventional deadlift","Wedge in · bar over mid-foot"],
+    acc:[[["Box jump","Explosive · step down · quality over fatigue"],["Barbell reverse lunge","Heavy · controlled"]],
+         [["Jump squat (light DBs)","Fast off the floor"],["Rear-foot elevated split squat","Barbell or heavy DBs"]]]},
+ 4:{sq:["Trap-bar deadlift","Main lift · stays heavy"],hg:["Single-leg RDL (DB)","Balance + hamstrings"],
+    acc:[[["Front-foot elevated split squat","Deep stretch · slow"],["Step-up (high box)","Hike-specific strength"]],
+         [["Goblet squat (tempo 3-1-1)","Time under tension"],["Lateral step-up","Glute med · hip stability"]]]},
+ 5:{sq:["Back squat","Familiar · crisp"],hg:["Romanian deadlift","Smooth reps"],
+    acc:[[["Bulgarian split squat","Light · rhythm"],["Step-up","Light"]],[["Reverse lunge (DB)","Light"],["Step-down (eccentric)","Slow"]]]}};
+const UPPER={
+ 1:{pu:["Pull-ups (weighted or assisted)","Full hang → chin over"],pr:["Incline DB press","Shoulder blades pinned"],rw:["Chest-supported row","Pause at the top"],oh:["Half-kneeling landmine press","Ribs down"]},
+ 2:{pu:["Weighted chin-ups","Palms facing you"],pr:["Flat DB bench press","Slow lower"],rw:["Single-arm DB row","Pull to the hip"],oh:["Seated DB shoulder press","No arching"]},
+ 3:{pu:["Weighted pull-ups","Heavy · full range"],pr:["Barbell bench press","Leg drive · bar to mid-chest"],rw:["Pendlay row","Explode up · reset each rep"],oh:["Push press","Dip and drive"]},
+ 4:{pu:["Neutral-grip pull-ups","Controlled"],pr:["DB floor press","Pause on the floor"],rw:["Seal row","Strict · no momentum"],oh:["Arnold press","Full rotation"]},
+ 5:{pu:["Pull-ups","Smooth"],pr:["Incline DB press","Light"],rw:["Cable row","Squeeze"],oh:["Landmine press","Light"]}};
+const POST=[[["Hip thrust","1s squeeze at lockout"],["Single-leg RDL","Balance + hamstrings"]],
+            [["Single-leg glute bridge","Drive through heel"],["Nordic curl (eccentric)","Lower as slowly as you can"]],
+            [["Good morning","Hinge · light and strict"],["Hamstring curl (slider/machine)","Slow return"]],
+            [["Kas glute bridge","Short range · constant tension"],["Back extension","Hold 2s at the top"]]];
+const CARRY=[["Farmers carry @ 2×24kg","Tall, quick steps"],["Suitcase carry (one side)","Don't lean · swap hands"],["Front-rack KB carry","Elbows up · breathe"],["Overhead carry (DB)","Lock out · ribs down"]];
+const CORE=[[["Copenhagen plank","3×20s/side"],["Pallof press","3×10/side"]],[["Hollow body hold","3×30s"],["Side plank + reach","3×30s/side"]],
+            [["Dead bug","3×10/side"],["Bird dog (slow)","3×8/side"]],[["Hanging knee raise","3×12"],["Plank shoulder taps","3×20"]]];
+const FINA=[{t:"Finisher — metabolic",cs:[{n:"KB swing @ 16–20kg",v:"20"},{n:"Goblet squat",v:"12"},{n:"Jump lunges",v:"20"},{n:"Rest",v:"60s"}]},
+            {t:"Finisher — sled + wall balls",cs:[{n:"Sled push",v:"20m"},{n:"Wall balls @ 6kg",v:"15"},{n:"Bike — hard",v:"10 cal"},{n:"Rest",v:"60s"}]},
+            {t:"Finisher — thruster burner",cs:[{n:"DB thrusters @ 2×8kg",v:"10"},{n:"Box step-overs",v:"12"},{n:"Burpees",v:"8"},{n:"Rest",v:"60s"}]},
+            {t:"Finisher — legs + engine",cs:[{n:"Row — hard",v:"12 cal"},{n:"KB swing @ 20kg",v:"15"},{n:"Skater hops",v:"20"},{n:"Rest",v:"60s"}]}];
+const FINB=[{t:"Finisher — upper burner",cs:[{n:"Push-ups",v:"12"},{n:"Renegade row @ 2×8kg",v:"10"},{n:"Ski erg",v:"12 cal"},{n:"Rest",v:"45s"}]},
+            {t:"Finisher — pull + push",cs:[{n:"Inverted rows",v:"10"},{n:"Pike push-ups",v:"8"},{n:"Battle ropes",v:"30s"},{n:"Rest",v:"45s"}]},
+            {t:"Finisher — shoulder burner",cs:[{n:"DB push press @ 2×7.5kg",v:"10"},{n:"Plate front raise",v:"12"},{n:"Ski erg",v:"10 cal"},{n:"Rest",v:"45s"}]},
+            {t:"Finisher — grip + engine",cs:[{n:"Farmers carry @ 2×20kg",v:"40m"},{n:"Bear crawl",v:"15m"},{n:"Row — hard",v:"10 cal"},{n:"Rest",v:"45s"}]}];
+
+function strA(lv,w){ const s=SA[lv], dl=lv==="deload"||lv==="taper", M=LOWER[PH(w)], acc=M.acc[(w-1)%2], core=ROT(CORE,w+PH(w)), fin=ROT(FINA,w+PH(w));
+  const calf=w%2?["Single-leg calf raise","Straight knee · slow lowering"]:["Seated soleus raise","Bent knee · pause at the top"];
   const secs=[
-   {lbl:"Warm-Up · 8 min",exs:[ex("a0","🚲","Bike or row — easy","5 min"),ex("a1","🧘","Hip + ankle mobility · glute bridge","2×12")]},
-   {lbl:"Main lifts · rest "+s.rest,exs:[ex("a2","🏋️","Back squat",s.sq,LIFTNOTE[lv],1),ex("a3","🏋️","Romanian deadlift",s.rdl,"Hinge, soft knees, bar close",1)]},
-   {lbl:"Single-leg + lower leg",exs:[ex("a4","🦵","Bulgarian split squat",s.bss,"DBs · front knee tracks over toes",1),
-     ...(s.su?[ex("a5","🦵","Weighted step-up",s.su,"Box at knee height · drive through the heel",1)]:[]),
-     ex("a6","🦶","Single-leg calf raise",s.calf,"Half straight-knee, half bent-knee · slow lowering",1),
-     ex("a7","🦶","Tibialis raise","2×20","Shin insurance for the mileage")]}];
-  if(!dl) secs.push({lbl:"Core",exs:[ex("a8","🧱","Copenhagen plank","3×20s/side"),ex("a9","🧱","Pallof press","3×10/side")]});
-  if(s.fin) secs.push({lbl:"Finisher — metabolic",fin:true,rounds:s.fin,cs:[{n:"KB swing @ 16–20kg",v:"20"},{n:"Goblet squat",v:"12"},{n:"Jump lunges",v:"20"},{n:"Rest",v:"60s"}]});
-  return {tag:"lower",dur:{found:"60 min",build:"60 min",heavy:"65 min",maint:"50 min",deload:"40 min",taper:"30 min"}[lv],
-    int:dl?55:lv==="heavy"?90:82,mac:"str",name:"Strength A",title:"Strength A — Lower Body",secs,km:0,kcal:dl?250:s.fin?450:380};
+   {lbl:"Warm-Up · 8 min",exs:[ex("a0","🚲","Bike or row — easy","5 min"),ex("a1","🧘","Hip + ankle mobility · glute bridge","2×12"),ex("a1b","🦵",w%2?"Banded lateral walk + monster walk":"Side-lying hip abduction (band)",w%2?"2×15m each":"2×15/side","Glute med — keeps hips level on long runs")]},
+   {lbl:"Main lifts · rest "+s.rest,exs:[ex("a2","🏋️",M.sq[0],s.sq,LIFTNOTE[lv]+" · "+M.sq[1],1),ex("a3","🏋️",M.hg[0],s.rdl,M.hg[1],1)]},
+   {lbl:"Single-leg + lower leg · pair each with the calf/shin move",exs:[ex("a4","🦵",acc[0][0],/jump/i.test(acc[0][0])?"4×3":s.bss,acc[0][1],!/jump/i.test(acc[0][0])),
+     ...(s.su?[ex("a5","🦵",acc[1][0],/jump/i.test(acc[1][0])?"4×5":s.su,acc[1][1],!/jump/i.test(acc[1][0]))]:[]),
+     ex("a6","🦶",calf[0],s.calf,calf[1],1),ex("a7","🦶","Tibialis raise","2×20","Shin insurance for the mileage")]}];
+  const finWk=!!s.fin&&w%2===1;
+  if(!dl&&!finWk) secs.push({lbl:"Core · superset",exs:[ex("a8","🧱",core[0][0],core[0][1]),ex("a9","🧱",core[1][0],core[1][1])]});
+  if(finWk) secs.push({lbl:fin.t+" · core moves to next week",fin:true,rounds:s.fin,cs:fin.cs});
+  return {tag:"lower",dur:{found:"55 min",build:"55 min",heavy:"60 min",maint:"45 min",deload:"40 min",taper:"25 min"}[lv],
+    muscles:"Quads · Glutes · Glute med · Hamstrings · Adductors · Calves · Shins · Core",int:dl?55:lv==="heavy"?90:82,mac:"str",name:"Strength A",title:"Strength A — Lower Body",secs,km:0,kcal:dl?250:s.fin?450:380};
 }
 const SB={
- found:{pu:"4×6",ip:"4×10",row:"4×10",lp:"3×10/side",ht:"3×12",slr:"3×10/leg",fc:"3×40m",fin:"3 rounds"},
- build:{pu:"4×5",ip:"4×8",row:"4×8",lp:"3×8/side",ht:"4×10",slr:"3×8/leg",fc:"4×40m",fin:"3 rounds"},
- heavy:{pu:"5×4",ip:"4×6",row:"4×6",lp:"3×6/side",ht:"4×8",slr:"3×8/leg",fc:"4×40m",fin:"3 rounds"},
- maint:{pu:"3×5",ip:"3×8",row:"3×8",lp:"2×8/side",ht:"3×8",slr:"2×8/leg",fc:"3×40m",fin:"2 rounds"},
- deload:{pu:"3×4",ip:"2×10",row:"3×10",lp:"2×8/side",ht:"2×10",slr:"2×8/leg",fc:"2×40m",fin:null},
+ found:{pu:"4×6",ip:"4×10",row:"4×10",lp:"3×10",ht:"3×12",slr:"3×10",fc:"3×40m",fin:"3 rounds"},
+ build:{pu:"4×5",ip:"4×8",row:"4×8",lp:"3×8",ht:"4×10",slr:"3×8",fc:"4×40m",fin:"3 rounds"},
+ heavy:{pu:"5×4",ip:"4×6",row:"4×6",lp:"3×6",ht:"4×8",slr:"3×8",fc:"4×40m",fin:"3 rounds"},
+ maint:{pu:"3×5",ip:"3×8",row:"3×8",lp:"2×8",ht:"3×8",slr:"2×8",fc:"3×40m",fin:"2 rounds"},
+ deload:{pu:"3×4",ip:"2×10",row:"3×10",lp:"2×8",ht:"2×10",slr:"2×8",fc:"2×40m",fin:null},
  taper:{pu:"2×4",ip:"2×8",row:"2×8",lp:null,ht:"2×8",slr:null,fc:null,fin:null}};
-function strB(lv,z2){ const s=SB[lv], dl=lv==="deload"||lv==="taper";
+function strB(lv,z2,w){ const s=SB[lv], dl=lv==="deload"||lv==="taper", U=UPPER[PH(w)], po=ROT(POST,w), ca=ROT(CARRY,w), core=ROT(CORE,w+2+PH(w)), fin=ROT(FINB,w+PH(w));
   const secs=[
-   {lbl:"Warm-Up · 6 min",exs:[ex("b0","🎯","Band pull-aparts + scap pull-ups","2×15 / 2×8")]},
-   {lbl:"Upper · rest "+(lv==="heavy"?"2 min":"90s"),exs:[ex("b1","💪","Pull-ups (weighted or assisted)",s.pu,LIFTNOTE[lv],1),
-     ex("b2","💪","Incline DB press",s.ip,"Shoulder blades pinned",1),ex("b3","💪","Chest-supported row",s.row,"Pause at the top",1),
-     ...(s.lp?[ex("b4","💪","Half-kneeling landmine press",s.lp,"Ribs down",1)]:[])]},
-   {lbl:"Posterior chain",exs:[ex("b5","🍑","Hip thrust",s.ht,"1s squeeze at lockout",1),
-     ...(s.slr?[ex("b6","🦵","Single-leg RDL",s.slr,"Balance + hamstrings — runner's lift",1)]:[]),
-     ...(s.fc?[ex("b7","🧳","Farmers carry @ 2×24kg",s.fc,"Tall, quick steps",1)]:[])]}];
-  if(!dl) secs.push({lbl:"Core",exs:[ex("b8","🧱","Hanging knee raise","3×12"),ex("b9","🧱","Dead bug","3×10/side")]});
-  if(s.fin) secs.push({lbl:"Finisher — upper burner",fin:true,rounds:s.fin,cs:[{n:"Push-ups",v:"12"},{n:"Renegade row @ 2×8kg",v:"10"},{n:"Ski erg",v:"12 cal"},{n:"Rest",v:"45s"}]});
-  secs.push({lbl:"Z2 flush run",exs:[ex("b10","🏃","Easy run",z2+" min","@ {E} · conversational · treadmill fine")]});
-  return {tag:"upper",dur:(dl?40:55)+z2+" min",int:dl?55:80,mac:"str",name:"Strength B",title:"Strength B — Upper + Posterior · Z2",secs,km:+(z2/7).toFixed(1),kcal:(dl?250:400)+z2*9};
+   {lbl:"Warm-Up · 6 min",exs:[ex("b0","🎯","Band pull-aparts + scap pull-ups","2×15 / 2×8","Rear delts + shoulder health")]},
+   {lbl:"Upper · superset pull + push · rest "+(lv==="heavy"?"2 min":"75s")+" after each pair",exs:[ex("b1","💪",U.pu[0],s.pu,LIFTNOTE[lv]+" · "+U.pu[1],1),
+     ex("b2","💪",U.pr[0],s.ip,U.pr[1],1),ex("b3","💪",U.rw[0],s.row,U.rw[1],1),
+     ...(s.lp?[ex("b4","💪",U.oh[0],s.lp,U.oh[1],1)]:[])]},
+   {lbl:"Posterior chain",exs:[ex("b5","🍑",po[0][0],s.ht,po[0][1],1),
+     ...(s.slr?[ex("b6","🦵",po[1][0],s.slr,po[1][1],!/nordic|extension/i.test(po[1][0]))]:[]),
+     ...(s.fc?[ex("b7","🧳",ca[0],s.fc,ca[1],1)]:[])]}];
+  if(lv!=="taper"){ const ar=w%2?[["Hammer curl","Neutral grip · no swing"],["Rope triceps pushdown","Elbows pinned"],["Lateral raise","Lead with elbows · light"]]
+                                   :[["Incline DB curl","Full stretch at the bottom"],["Overhead triceps extension","Deep stretch"],["Face pull","Pull to the eyes · rear delts"]];
+    const as=lv==="deload"?"2×10":lv==="maint"?"2×12":"3×12";
+    secs.push({lbl:"Arms + delts · superset · 60s rest",exs:ar.map((x,i)=>ex("b1"+(i+1),"💪",x[0],as,x[1],1))}); }
+  const finWk=!!s.fin&&w%2===0;
+  if(!dl&&!finWk) secs.push({lbl:"Core · superset",exs:[ex("b8","🧱",core[0][0],core[0][1]),ex("b9","🧱",core[1][0],core[1][1])]});
+  if(finWk) secs.push({lbl:fin.t+" · core moves to next week",fin:true,rounds:s.fin,cs:fin.cs});
+  z2=15; secs.push({lbl:"Z2 flush run",exs:[ex("b10","🏃","Easy run",z2+" min","@ {E} · conversational · treadmill fine")]});
+  return {tag:"upper",muscles:"Lats · Upper back · Rear delts · Chest · Shoulders · Biceps · Triceps · Glutes · Hamstrings · Grip · Core",dur:{found:"60 min",build:"60 min",heavy:"60 min",maint:"55 min",deload:"50 min",taper:"40 min"}[lv],int:dl?55:80,mac:"str",name:"Strength B",title:"Strength B — Upper + Posterior · Z2",secs,km:+(z2/7).toFixed(1),kcal:(dl?250:400)+z2*9};
 }
-function tueRun(t){ return {tag:"run",dur:Math.round(t.km*6+12)+" min",int:86,mac:"hard",tip:"Early session? 20–30g fast carbs before (banana / rice cakes + honey)",
+function tueRun(t){ return {tag:"run",dur:Math.min(60,(t.tm||35)+17)+" min",int:86,mac:"hard",tip:"Early session? 20–30g fast carbs before (banana / rice cakes + honey)",
   name:t.n,title:t.n+" — "+t.s,km:t.km,kcal:Math.round(t.km*61),secs:[
-  {lbl:"Warm-Up · 15 min",exs:[ex("t0","🏃","Easy jog","10 min","@ {E}"),ex("t1","⚡","Drills: A-skips · high knees · butt kicks","2×20m"),ex("t2","💨","Strides","4×80m","Build to rep pace")]},
+  {lbl:"Warm-Up · 12 min",exs:[ex("t0","🏃","Easy jog","8 min","@ {E}"),ex("t1","⚡","Drills: A-skips · high knees · butt kicks","2×20m"),ex("t2","💨","Strides","4×80m","Build to rep pace")]},
   {lbl:"Main set",exs:[ex("t3","🎯",t.n,t.s,t.note)]},
-  {lbl:"Cool-Down · 10 min",exs:[ex("t4","🚶","Easy jog","8 min","@ {E}"),ex("t5","🦵","Calf + hip flexor stretch","3 min")]}]}; }
-function hiit(w,mins){ const f=(w-1)%4; let title,rounds,cs,lbl;
+  {lbl:"Cool-Down · 5 min",exs:[ex("t4","🚶","Easy jog + stretch","5 min","@ {E}")]}]}; }
+function hiit(w,mins){ const f=(w-1)%8; let title,rounds,cs,lbl,km=0;
+  const R4=mins>=36?4:mins>=28?3:2;
   if(f===0){ rounds=Math.round(mins/4); title="EMOM "+mins; lbl="EMOM — "+mins+" min · every minute on the minute"; cs=[{n:"Min 1: Ski erg",v:"14 cal"},{n:"Min 2: Wall balls @ 6kg",v:"15"},{n:"Min 3: Row",v:"14 cal"},{n:"Min 4: Burpees",v:"10"}]; }
-  else if(f===1){ rounds=mins>=36?4:mins>=28?3:2; title="Engine Chipper"; lbl="For time — "+rounds+" rounds · 90s rest between · log your time"; cs=[{n:"Run @ {T}",v:"800m"},{n:"Wall balls @ 6kg",v:"20"},{n:"KB swings @ 20kg",v:"15"},{n:"Burpee broad jumps",v:"10"},{n:"Farmers carry @ 2×20kg",v:"50m"}]; }
-  else if(f===2){ rounds=Math.max(4,Math.round(mins/5)); title="Sled + Sprint"; lbl=rounds+" rounds · 60s rest"; cs=[{n:"Sled push",v:"25m"},{n:"Sled pull",v:"25m"},{n:"Run — hard",v:"300m"},{n:"DB thrusters @ 2×10kg",v:"10"}]; }
-  else { rounds=mins>=36?5:mins>=28?4:3; title="Tabata Stack"; lbl=rounds+" blocks · 8× 20s on / 10s off each · 1 min between";
+  else if(f===1){ rounds=R4; title="Engine Chipper"; lbl="For time — "+rounds+" rounds · 90s rest between · log your time"; km=rounds*0.8; cs=[{n:"Run @ {T}",v:"800m"},{n:"Wall balls @ 6kg",v:"20"},{n:"KB swings @ 20kg",v:"15"},{n:"Burpee broad jumps",v:"10"},{n:"Farmers carry @ 2×20kg",v:"50m"}]; }
+  else if(f===2){ rounds=Math.max(4,Math.round(mins/5)); title="Sled + Sprint"; lbl=rounds+" rounds · 60s rest"; km=rounds*0.3; cs=[{n:"Sled push",v:"25m"},{n:"Sled pull",v:"25m"},{n:"Run — hard",v:"300m"},{n:"DB thrusters @ 2×10kg",v:"10"}]; }
+  else if(f===3){ rounds=mins>=36?5:mins>=28?4:3; title="Tabata Stack"; lbl=rounds+" blocks · 8× 20s on / 10s off each · 1 min between";
     cs=[{n:"Block 1: Assault bike",v:"8×20s"},{n:"Block 2: KB swing @ 16kg",v:"8×20s"},{n:"Block 3: Mountain climbers",v:"8×20s"},{n:"Block 4: Jump squats",v:"8×20s"},{n:"Block 5: Ski erg",v:"8×20s"}].slice(0,rounds); }
-  return {tag:"hybrid",dur:(mins+15)+" min",int:mins>=36?95:mins>=30?90:80,mac:"hard",tip:"Biggest calorie burn of the week — carbs before and after",
-    name:title,title:"HIIT Engine — "+title,km:f===1?rounds*0.8:0,kcal:mins*12+120,secs:[
+  else if(f===4){ rounds=Math.round(mins/5); title="AMRAP "+Math.round(mins*0.75); lbl="AMRAP "+Math.round(mins*0.75)+" min · tick each round · log total"; km=rounds*0.4; cs=[{n:"Run",v:"400m"},{n:"DB snatch @ 12kg (alt.)",v:"16"},{n:"Box jump-overs",v:"12"},{n:"V-ups",v:"12"}]; }
+  else if(f===5){ rounds=R4; title="Compromised Runs"; lbl=rounds+" rounds · HYROX-style · run straight off each station"; km=rounds; cs=[{n:"Run @ {T}",v:"1 km"},{n:"Round 1: Sled push",v:"50m"},{n:"Round 2: Wall balls @ 6kg",v:"30"},{n:"Round 3: Sandbag lunges",v:"40m"},{n:"Round 4: Row",v:"500m"}].slice(0,rounds+1); }
+  else if(f===6){ rounds=7; title="Erg Pyramid"; lbl="1-2-3-4-3-2-1 min hard · equal rest · rotate row → ski → bike"; cs=[{n:"1 min",v:"hard"},{n:"2 min",v:"hard"},{n:"3 min",v:"hard"},{n:"4 min",v:"hard"},{n:"3 min",v:"hard"},{n:"2 min",v:"hard"},{n:"1 min",v:"all out"}]; }
+  else { rounds=3; title="21-15-9"; lbl="21-15-9 reps · 400m run after each round · for time"; km=1.2; cs=[{n:"DB thrusters @ 2×8kg",v:"21-15-9"},{n:"Burpees",v:"21-15-9"},{n:"Bike",v:"21-15-9 cal"},{n:"Run",v:"400m"}]; }
+  return {tag:"hybrid",muscles:"Full body · Engine · Lactate tolerance",dur:(mins+15)+" min",int:mins>=36?95:mins>=30?90:80,mac:"hard",tip:"Biggest calorie burn of the week — carbs before and after",
+    name:title,title:"HIIT Engine — "+title,km:+km.toFixed(1),kcal:mins*12+120,secs:[
     {lbl:"Warm-Up · 8 min",exs:[ex("h0","🚣","Row easy","4 min"),ex("h1","🔄","Inchworms · leg swings · 10 air squats","1 round"),ex("h2","⚡","Primer: 1 slow round of the circuit","1×")]},
     {lbl,fin:true,rounds:rounds+" rounds",cs},
     {lbl:"Cool-Down",exs:[ex("h3","🚶","Walk / easy bike + stretch","6 min","Log time or reps in notes")]}]}; }
@@ -208,7 +259,8 @@ function satRun(w,s){
   return null;
 }
 function sunRun(w,s){
-  if(s.t==="z2") return {tag:"run",dur:Math.round(s.km*7)+" min",int:45,mac:"sun",optional:!!s.opt,name:"Z2 Run",title:"Z2 Run — "+s.km+" km"+(s.opt?" · Optional":""),km:s.km,kcal:Math.round(s.km*61),
+  if(s.t==="z2"){ s={...s,km:Math.min(s.km,8.5)}; } 
+  if(s.t==="z2") return {tag:"run",dur:Math.min(60,Math.round(s.km*7))+" min",int:45,mac:"sun",optional:!!s.opt,name:"Z2 Run",title:"Z2 Run — "+s.km+" km"+(s.opt?" · Optional":""),km:s.km,kcal:Math.round(s.km*61),
     tip:s.opt?"Skip if WHOOP recovery is low":"",secs:[{lbl:"Aerobic",exs:[ex("s0","🏃","Easy run",s.km+" km","@ {E} · nose-breathing easy")]},{lbl:"Mobility",exs:[ex("s1","🧘","Hips · calves · T-spine","10 min")]}]};
   if(s.t==="b2b"){ const km=+(s.y*YARD).toFixed(1); return {tag:"long",dur:s.y+" h",int:70,mac:"sun",name:"Back-to-Back",title:"Back-to-Back — "+s.y+" yard"+(s.y>1?"s":"")+" on tired legs",km,kcal:Math.round(km*61),
     tip:"Breakfast 2h before · same fuel as Saturday",secs:[{lbl:"Yards — on the hour",yards:s.y},{lbl:"Focus",exs:[ex("s2","🐢","Yard pace, even when it feels slow","@ {Y}","This teaches the legs to keep going on day 2")]}]}; }
@@ -225,7 +277,7 @@ function getDays(w){
   const k=WK[w];
   if(w===17){ d=[
       {tag:"run",dur:"50 min",int:60,mac:"hard",name:"Easy + Strides",title:"Easy Run + Strides — before you fly",km:8,kcal:490,secs:[{lbl:"Run",exs:[ex("v0","🏃","Easy run","8 km","@ {E}"),ex("v1","💨","Strides","6×20s","Relaxed fast")]}]},
-      strA("maint"),
+      strA("maint",17),
       {...REST,title:"Travel day ✈️",restNote:"Hydrate on the flight · walk the airport · sleep when you can"},
       hotelCircuit(),
       {tag:"run",dur:"45–60 min",int:50,mac:"sun",name:"Easy Run",title:"Easy Run — early, before the heat",km:8,kcal:490,tip:"Electrolytes — it's hot and humid",secs:[{lbl:"Run",exs:[ex("v2","🏃","Easy run / treadmill","45–60 min","@ {E} · slower in the heat is correct")]}]},
@@ -234,9 +286,9 @@ function getDays(w){
       {tag:"run",dur:"30 min",int:40,mac:"sun",optional:true,name:"Easy Run",title:"Easy Run — Optional",km:5,kcal:300,secs:[{lbl:"Run",exs:[ex("v4","🏃","Easy run / treadmill","30 min","@ {E}")]}]},
       hotelCircuit(),
       {...REST,title:"Travel day ✈️",restNote:"Home tonight · hydrate · normal meals"},
-      strB("maint",20), satRun(18,{t:"long",km:18}), sunRun(18,{t:"z2",km:8}), {...REST}]; }
+      strB("maint",20,18), satRun(18,{t:"long",km:18}), sunRun(18,{t:"z2",km:8}), {...REST}]; }
   else if(w===23){ const g=+(DATA.goal||6);
-    d=[ {...strA("taper"),title:"Strength A — Taper Touch",dur:"25 min"},
+    d=[ {...strA("taper",23),title:"Strength A — Taper Touch",dur:"25 min"},
       {tag:"run",dur:"35 min",int:55,mac:"hard",name:"Openers",title:"Openers — 4×400m",km:6,kcal:370,secs:[
         {lbl:"Warm-Up",exs:[ex("o0","🏃","Easy jog","10 min","@ {E}"),ex("o1","💨","Strides","3×80m")]},
         {lbl:"Openers",exs:[ex("o2","🎯","400m repeats","4×400m","@ {R} · 2 min walk · crisp, not hard")]},
@@ -257,7 +309,7 @@ function getDays(w){
           ex("r6","🧠","Break it down: one yard at a time","—","Goal: "+g+" yards · then see")]},
         {lbl:"Your yards — log every lap",yards:Math.min(30,g+4)}]},
       {...REST,title:"Rest & Celebrate 🏆",restNote:"Eat, sleep, feet up. Easy walking only this week."}]; }
-  else { d=[tueRun(k.tue),strA(k.str),hiit(w,k.hl),strB(k.str,k.thu),satRun(w,k.sat),sunRun(w,k.sun),{...REST}]; }
+  else { d=[tueRun(k.tue),strA(k.str,w),hiit(w,k.hl),strB(k.str,k.thu,w),satRun(w,k.sat),sunRun(w,k.sun),{...REST}]; }
 
   const TC={run:C.blue,long:C.lime,lower:C.purple,upper:C.orange,hybrid:C.red,rest:C.muted};
   let n=0; return d.map(x=>({...x,num:x.race?"RACE":x.rest?"R":"D"+(++n),c:(x.peak||x.race)?C.red:TC[x.tag]}));
@@ -366,7 +418,8 @@ function dayCard(day,dk){
       ${day.km?`<span style="font-family:${F.mono};font-size:11px;color:${C.muted}">${day.km} km</span>`:""}
       ${day.kcal?`<span style="font-family:${F.mono};font-size:11px;color:${C.muted}">~${day.kcal} kcal</span>`:""}
       ${day.optional?`<span style="font-family:${F.mono};font-size:10px;color:${C.muted}">optional</span>`:""}</div>
-    <div style="margin-bottom:12px">${bar(day.int,day.c)}</div>${macroStrip(day)}`;
+    <div style="margin-bottom:${day.muscles?8:12}px">${bar(day.int,day.c)}</div>
+    ${day.muscles?`<div style="font-family:${F.mono};font-size:9.5px;color:${C.muted};letter-spacing:.06em;line-height:1.6;margin-bottom:12px"><span style="color:${GOLD}">MUSCLES</span> · ${e(day.muscles)}</div>`:""}${macroStrip(day)}`;
   if(isRun){
     h+=`<div style="display:flex;gap:4px;background:${C.surface};border:1px solid ${C.border};border-radius:10px;padding:4px;margin-bottom:12px">
       ${[["out","🌳 Outdoor"],["tm","🏠 Treadmill"]].map(([v,l])=>`<div data-act="env" data-v="${v}" style="flex:1;text-align:center;padding:8px 4px;border-radius:8px;background:${env===v?C.blue:"transparent"};color:${env===v?C.ink:C.muted};font-family:${F.mono};font-size:11px;font-weight:${env===v?700:400};cursor:pointer">${l}</div>`).join("")}</div>`;
