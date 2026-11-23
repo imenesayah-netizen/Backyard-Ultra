@@ -119,94 +119,68 @@ function ps(s){ const m=String(s||"").trim().match(/^(\d+):(\d{1,2})(?::(\d{1,2}
 const ex=(id,ic,n,s,note,load)=>({id,ic,n,s,note:note||"",load:!!load});
 const carbsH=w=>w<=6?"30–40g/h":w<=12?"45g/h":"60–75g/h";
 
-const SA={
- found:{sq:"4×8",rdl:"3×10",bss:"3×10/leg",su:"3×12/leg",calf:"3×15",fin:"3 rounds",rest:"90s"},
- build:{sq:"4×6",rdl:"4×8",bss:"3×8/leg",su:"3×10/leg",calf:"4×12",fin:"4 rounds",rest:"2 min"},
- heavy:{sq:"5×5",rdl:"4×6",bss:"4×6/leg",su:"3×8/leg",calf:"4×10",fin:"3 rounds",rest:"2–3 min"},
- maint:{sq:"3×5",rdl:"3×6",bss:"2×8/leg",su:"2×10/leg",calf:"3×12",fin:"2 rounds",rest:"2 min"},
- deload:{sq:"3×5",rdl:"2×8",bss:"2×8/leg",su:"2×10/leg",calf:"2×15",fin:null,rest:"90s"},
- taper:{sq:"2×5",rdl:"2×6",bss:"1×8/leg",su:null,calf:"2×12",fin:null,rest:"2 min"}};
-const LIFTNOTE={found:"RPE 7 · 2 reps in the tank",build:"RPE 7–8 · add load when every rep is clean",heavy:"RPE 8–9 · heaviest block of the year",maint:"Keep it heavy, cut the volume — this is what protects your muscle",deload:"~70% of working weight · crisp reps",taper:"Light · just keep the pattern"};
 
-// ── exercise rotation: main lifts change by phase, accessories/core/finishers rotate weekly ──
-const PH=w=>Math.min(phOf(w),5); // phases 5+6 share a menu
+
+
+// ── STRENGTH — 4 blocks, supersets, main lifts by phase, accessories rotate every 2 weeks ──
+const PH=w=>Math.min(phOf(w),5);
 const ROT=(arr,w)=>arr[(w-1)%arr.length];
+const FORT=(arr,w)=>arr[Math.floor((w-1)/2)%arr.length];
+const SETS={ // main / accessory sets by level
+ found:{m:"3×10",h:"3×10",a:"3×12",rest:"90s",rpe:"RPE 7 · 2–3 reps in reserve"},
+ build:{m:"4×8", h:"4×8", a:"3×10",rest:"2 min",rpe:"RPE 7–8 · add 2.5–5kg when every set hits the top of the range"},
+ heavy:{m:"5×5", h:"4×5", a:"3×8", rest:"2–3 min",rpe:"RPE 8–9 · heaviest block of the year"},
+ maint:{m:"3×5", h:"3×6", a:"2×8", rest:"2 min",rpe:"Keep the load heavy, cut the volume — protects muscle"},
+ deload:{m:"3×5",h:"2×8", a:"2×10",rest:"90s",rpe:"~70% of working weight · crisp reps"},
+ taper:{m:"2×5", h:"2×5", a:null, rest:"2 min",rpe:"Light · stay sharp"}};
 const LOWER={
- 1:{sq:["Back squat","Full depth · brace hard"],hg:["Romanian deadlift","Hinge, soft knees, bar close"],
-    acc:[[["Bulgarian split squat","DBs · front knee tracks toes"],["Weighted step-up","Box at knee height · drive through heel"]],
-         [["Reverse lunge (DB)","Step back, long stride · knee kisses floor"],["Lateral lunge (DB)","Sit into the hip · chest up"]]]},
- 2:{sq:["Front squat","Elbows high · upright torso"],hg:["Trap-bar deadlift","Push the floor away"],
-    acc:[[["Walking lunge (DB)","Long steps · no wobble"],["Single-leg box squat","Control down · tap and stand"]],
-         [["Bulgarian split squat","DBs · pause 1s at the bottom"],["Step-down (eccentric)","3s lower · runner's knee insurance"]]]},
- 3:{sq:["Back squat — heavy","Heaviest of the year · full rest"],hg:["Conventional deadlift","Wedge in · bar over mid-foot"],
-    acc:[[["Box jump","Explosive · step down · quality over fatigue"],["Barbell reverse lunge","Heavy · controlled"]],
-         [["Jump squat (light DBs)","Fast off the floor"],["Rear-foot elevated split squat","Barbell or heavy DBs"]]]},
- 4:{sq:["Trap-bar deadlift","Main lift · stays heavy"],hg:["Single-leg RDL (DB)","Balance + hamstrings"],
-    acc:[[["Front-foot elevated split squat","Deep stretch · slow"],["Step-up (high box)","Hike-specific strength"]],
-         [["Goblet squat (tempo 3-1-1)","Time under tension"],["Lateral step-up","Glute med · hip stability"]]]},
- 5:{sq:["Back squat","Familiar · crisp"],hg:["Romanian deadlift","Smooth reps"],
-    acc:[[["Bulgarian split squat","Light · rhythm"],["Step-up","Light"]],[["Reverse lunge (DB)","Light"],["Step-down (eccentric)","Slow"]]]}};
+ 1:{sq:["Back squat","Full depth · brace hard"],hg:["Romanian deadlift","Hinge, soft knees, bar close"],sl:[["Bulgarian split squat","DBs · front knee over toes"],["Reverse lunge (DB)","Long step back · knee kisses floor"]]},
+ 2:{sq:["Front squat","Elbows high · upright torso"],hg:["Trap-bar deadlift","Push the floor away"],sl:[["Step-up (high box)","Drive through the heel · no push-off"],["Walking lunge (DB)","Long steps · steady"]]},
+ 3:{sq:["Back squat — heavy","Full rest between sets"],hg:["Conventional deadlift","Wedge in · bar over mid-foot"],sl:[["Barbell reverse lunge","Heavy · controlled"],["Rear-foot elevated split squat","Barbell or heavy DBs"]]},
+ 4:{sq:["Front squat","Heavy, low volume"],hg:["Trap-bar deadlift","Heavy, low volume"],sl:[["Front-foot elevated split squat","Deep · slow"],["Lateral step-up","Glute med · hip stability"]]},
+ 5:{sq:["Back squat","Familiar · crisp"],hg:["Romanian deadlift","Smooth"],sl:[["Bulgarian split squat","Light"],["Step-up","Light"]]}};
 const UPPER={
  1:{pu:["Pull-ups (weighted or assisted)","Full hang → chin over"],pr:["Incline DB press","Shoulder blades pinned"],rw:["Chest-supported row","Pause at the top"],oh:["Half-kneeling landmine press","Ribs down"]},
  2:{pu:["Weighted chin-ups","Palms facing you"],pr:["Flat DB bench press","Slow lower"],rw:["Single-arm DB row","Pull to the hip"],oh:["Seated DB shoulder press","No arching"]},
  3:{pu:["Weighted pull-ups","Heavy · full range"],pr:["Barbell bench press","Leg drive · bar to mid-chest"],rw:["Pendlay row","Explode up · reset each rep"],oh:["Push press","Dip and drive"]},
- 4:{pu:["Neutral-grip pull-ups","Controlled"],pr:["DB floor press","Pause on the floor"],rw:["Seal row","Strict · no momentum"],oh:["Arnold press","Full rotation"]},
+ 4:{pu:["Neutral-grip pull-ups","Controlled"],pr:["DB floor press","Pause on the floor"],rw:["Seal row","Strict"],oh:["Arnold press","Full rotation"]},
  5:{pu:["Pull-ups","Smooth"],pr:["Incline DB press","Light"],rw:["Cable row","Squeeze"],oh:["Landmine press","Light"]}};
-const POST=[[["Hip thrust","1s squeeze at lockout"],["Single-leg RDL","Balance + hamstrings"]],
-            [["Single-leg glute bridge","Drive through heel"],["Nordic curl (eccentric)","Lower as slowly as you can"]],
-            [["Good morning","Hinge · light and strict"],["Hamstring curl (slider/machine)","Slow return"]],
-            [["Kas glute bridge","Short range · constant tension"],["Back extension","Hold 2s at the top"]]];
-const CARRY=[["Farmers carry @ 2×24kg","Tall, quick steps"],["Suitcase carry (one side)","Don't lean · swap hands"],["Front-rack KB carry","Elbows up · breathe"],["Overhead carry (DB)","Lock out · ribs down"]];
-const CORE=[[["Copenhagen plank","3×20s/side"],["Pallof press","3×10/side"]],[["Hollow body hold","3×30s"],["Side plank + reach","3×30s/side"]],
-            [["Dead bug","3×10/side"],["Bird dog (slow)","3×8/side"]],[["Hanging knee raise","3×12"],["Plank shoulder taps","3×20"]]];
-const FINA=[{t:"Finisher — metabolic",cs:[{n:"KB swing @ 16–20kg",v:"20"},{n:"Goblet squat",v:"12"},{n:"Jump lunges",v:"20"},{n:"Rest",v:"60s"}]},
-            {t:"Finisher — sled + wall balls",cs:[{n:"Sled push",v:"20m"},{n:"Wall balls @ 6kg",v:"15"},{n:"Bike — hard",v:"10 cal"},{n:"Rest",v:"60s"}]},
-            {t:"Finisher — thruster burner",cs:[{n:"DB thrusters @ 2×8kg",v:"10"},{n:"Box step-overs",v:"12"},{n:"Burpees",v:"8"},{n:"Rest",v:"60s"}]},
-            {t:"Finisher — legs + engine",cs:[{n:"Row — hard",v:"12 cal"},{n:"KB swing @ 20kg",v:"15"},{n:"Skater hops",v:"20"},{n:"Rest",v:"60s"}]}];
-const FINB=[{t:"Finisher — upper burner",cs:[{n:"Push-ups",v:"12"},{n:"Renegade row @ 2×8kg",v:"10"},{n:"Ski erg",v:"12 cal"},{n:"Rest",v:"45s"}]},
-            {t:"Finisher — pull + push",cs:[{n:"Inverted rows",v:"10"},{n:"Pike push-ups",v:"8"},{n:"Battle ropes",v:"30s"},{n:"Rest",v:"45s"}]},
-            {t:"Finisher — shoulder burner",cs:[{n:"DB push press @ 2×7.5kg",v:"10"},{n:"Plate front raise",v:"12"},{n:"Ski erg",v:"10 cal"},{n:"Rest",v:"45s"}]},
-            {t:"Finisher — grip + engine",cs:[{n:"Farmers carry @ 2×20kg",v:"40m"},{n:"Bear crawl",v:"15m"},{n:"Row — hard",v:"10 cal"},{n:"Rest",v:"45s"}]}];
+const GMED=[["Banded lateral walk + monster walk","2×15m each"],["Side-lying hip abduction (band)","2×15/side"],["Clamshell (band) + glute bridge","2×15"]];
+const CALF=[["Single-leg calf raise","Straight knee · slow lowering"],["Seated soleus raise","Bent knee · pause at the top"]];
+const COREA=[["Copenhagen plank","3×20s/side"],["Side plank + reach","3×30s/side"],["Pallof press","3×10/side"]];
+const COREB=[["Dead bug","3×10/side"],["Hollow body hold","3×30s"],["Hanging knee raise","3×12"]];
+const POSTB=[["Hip thrust","1s squeeze at lockout",1],["Nordic curl (eccentric)","Lower as slowly as you can",0],["Single-leg glute bridge","Drive through the heel",1],["Back extension","Hold 2s at the top",0]];
+const ARMS=[[["Hammer curl","Neutral grip · no swing"],["Rope triceps pushdown","Elbows pinned"]],
+            [["Lateral raise","Lead with elbows · light"],["Face pull","Pull to the eyes · rear delts"]],
+            [["Incline DB curl","Full stretch at the bottom"],["Overhead triceps extension","Deep stretch"]],
+            [["Lateral raise","Slow lowering"],["Rear-delt fly","Light · squeeze"]]];
+const FINA=[{t:"Optional finisher · 5 min",cs:[{n:"KB swing @ 16–20kg",v:"15"},{n:"Jump lunges",v:"16"},{n:"Rest",v:"30s"}]},
+            {t:"Optional finisher · 5 min",cs:[{n:"Sled push",v:"20m"},{n:"Wall balls @ 6kg",v:"12"},{n:"Rest",v:"30s"}]},
+            {t:"Optional finisher · 5 min",cs:[{n:"DB thrusters @ 2×8kg",v:"10"},{n:"Burpees",v:"8"},{n:"Rest",v:"30s"}]}];
 
-function strA(lv,w){ const s=SA[lv], dl=lv==="deload"||lv==="taper", M=LOWER[PH(w)], acc=M.acc[(w-1)%2], core=ROT(CORE,w+PH(w)), fin=ROT(FINA,w+PH(w));
-  const calf=w%2?["Single-leg calf raise","Straight knee · slow lowering"]:["Seated soleus raise","Bent knee · pause at the top"];
+function strA(lv,w){ const s=SETS[lv], dl=lv==="deload"||lv==="taper", L=LOWER[PH(w)], sl=FORT(L.sl,w), calf=FORT(CALF,w), core=FORT(COREA,w), g=FORT(GMED,w);
   const secs=[
-   {lbl:"Warm-Up · 8 min",exs:[ex("a0","🚲","Bike or row — easy","5 min"),ex("a1","🧘","Hip + ankle mobility · glute bridge","2×12"),ex("a1b","🦵",w%2?"Banded lateral walk + monster walk":"Side-lying hip abduction (band)",w%2?"2×15m each":"2×15/side","Glute med — keeps hips level on long runs")]},
-   {lbl:"Main lifts · rest "+s.rest,exs:[ex("a2","🏋️",M.sq[0],s.sq,LIFTNOTE[lv]+" · "+M.sq[1],1),ex("a3","🏋️",M.hg[0],s.rdl,M.hg[1],1)]},
-   {lbl:"Single-leg + lower leg · pair each with the calf/shin move",exs:[ex("a4","🦵",acc[0][0],/jump/i.test(acc[0][0])?"4×3":s.bss,acc[0][1],!/jump/i.test(acc[0][0])),
-     ...(s.su?[ex("a5","🦵",acc[1][0],/jump/i.test(acc[1][0])?"4×5":s.su,acc[1][1],!/jump/i.test(acc[1][0]))]:[]),
-     ex("a6","🦶",calf[0],s.calf,calf[1],1),ex("a7","🦶","Tibialis raise","2×20","Shin insurance for the mileage")]}];
-  const finWk=!!s.fin&&w%2===1;
-  if(!dl&&!finWk) secs.push({lbl:"Core · superset",exs:[ex("a8","🧱",core[0][0],core[0][1]),ex("a9","🧱",core[1][0],core[1][1])]});
-  if(finWk) secs.push({lbl:fin.t+" · core moves to next week",fin:true,rounds:s.fin,cs:fin.cs});
-  return {tag:"lower",dur:{found:"55 min",build:"55 min",heavy:"60 min",maint:"45 min",deload:"40 min",taper:"25 min"}[lv],
-    muscles:"Quads · Glutes · Glute med · Hamstrings · Adductors · Calves · Shins · Core",int:dl?55:lv==="heavy"?90:82,mac:"str",name:"Strength A",title:"Strength A — Lower Body",secs,km:0,kcal:dl?250:s.fin?450:380};
+   {lbl:"Warm-Up · 8 min",exs:[ex("a0","🚲","Bike or row — easy","5 min"),ex("a1","🦵",g[0],g[1],"Glute med — keeps hips level on long runs")]},
+   {lbl:"Block 1 · main lift · rest "+s.rest,exs:[...(lv==="heavy"?[ex("a1p","⚡","Box jump","4×3","Explosive · step down · do these first")]:[]),ex("a2","🏋️",L.sq[0],s.m,s.rpe+" · "+L.sq[1],1)]},
+   {lbl:"Block 2 · main lift · rest "+s.rest,exs:[ex("a3","🏋️",L.hg[0],s.h,L.hg[1],1)]}];
+  if(s.a) secs.push({lbl:"Block 3 · superset · 60s rest",exs:[ex("a4","🦵",sl[0],s.a.replace(/(\d+)$/,"$1/leg"),sl[1],1),ex("a5","🦶",calf[0],s.a,calf[1],1)]});
+  secs.push({lbl:"Block 4 · superset · 45s rest",exs:[ex("a6","🦶","Tibialis raise","2×20","Shin insurance for the mileage"),...(dl?[]:[ex("a7","🧱",core[0],core[1])])]});
+  if(lv==="found"||lv==="build") secs.push({lbl:FORT(FINA,w).t,fin:true,rounds:"3 rounds",cs:FORT(FINA,w).cs});
+  return {tag:"lower",muscles:"Quads · Glutes · Glute med · Hamstrings · Adductors · Calves · Shins · Core",
+    dur:{found:"50 min",build:"50 min",heavy:"55 min",maint:"45 min",deload:"40 min",taper:"25 min"}[lv],
+    int:dl?55:lv==="heavy"?90:82,mac:"str",name:"Strength A",title:"Strength A — Lower",secs,km:0,kcal:dl?250:400};
 }
-const SB={
- found:{pu:"4×6",ip:"4×10",row:"4×10",lp:"3×10",ht:"3×12",slr:"3×10",fc:"3×40m",fin:"3 rounds"},
- build:{pu:"4×5",ip:"4×8",row:"4×8",lp:"3×8",ht:"4×10",slr:"3×8",fc:"4×40m",fin:"3 rounds"},
- heavy:{pu:"5×4",ip:"4×6",row:"4×6",lp:"3×6",ht:"4×8",slr:"3×8",fc:"4×40m",fin:"3 rounds"},
- maint:{pu:"3×5",ip:"3×8",row:"3×8",lp:"2×8",ht:"3×8",slr:"2×8",fc:"3×40m",fin:"2 rounds"},
- deload:{pu:"3×4",ip:"2×10",row:"3×10",lp:"2×8",ht:"2×10",slr:"2×8",fc:"2×40m",fin:null},
- taper:{pu:"2×4",ip:"2×8",row:"2×8",lp:null,ht:"2×8",slr:null,fc:null,fin:null}};
-function strB(lv,z2,w){ const s=SB[lv], dl=lv==="deload"||lv==="taper", U=UPPER[PH(w)], po=ROT(POST,w), ca=ROT(CARRY,w), core=ROT(CORE,w+2+PH(w)), fin=ROT(FINB,w+PH(w));
+function strB(lv,z2,w){ const s=SETS[lv], dl=lv==="deload"||lv==="taper", U=UPPER[PH(w)], po=FORT(POSTB,w), core=FORT(COREB,w), ar=FORT(ARMS,w);
   const secs=[
    {lbl:"Warm-Up · 6 min",exs:[ex("b0","🎯","Band pull-aparts + scap pull-ups","2×15 / 2×8","Rear delts + shoulder health")]},
-   {lbl:"Upper · superset pull + push · rest "+(lv==="heavy"?"2 min":"75s")+" after each pair",exs:[ex("b1","💪",U.pu[0],s.pu,LIFTNOTE[lv]+" · "+U.pu[1],1),
-     ex("b2","💪",U.pr[0],s.ip,U.pr[1],1),ex("b3","💪",U.rw[0],s.row,U.rw[1],1),
-     ...(s.lp?[ex("b4","💪",U.oh[0],s.lp,U.oh[1],1)]:[])]},
-   {lbl:"Posterior chain",exs:[ex("b5","🍑",po[0][0],s.ht,po[0][1],1),
-     ...(s.slr?[ex("b6","🦵",po[1][0],s.slr,po[1][1],!/nordic|extension/i.test(po[1][0]))]:[]),
-     ...(s.fc?[ex("b7","🧳",ca[0],s.fc,ca[1],1)]:[])]}];
-  if(lv!=="taper"){ const ar=w%2?[["Hammer curl","Neutral grip · no swing"],["Rope triceps pushdown","Elbows pinned"],["Lateral raise","Lead with elbows · light"]]
-                                   :[["Incline DB curl","Full stretch at the bottom"],["Overhead triceps extension","Deep stretch"],["Face pull","Pull to the eyes · rear delts"]];
-    const as=lv==="deload"?"2×10":lv==="maint"?"2×12":"3×12";
-    secs.push({lbl:"Arms + delts · superset · 60s rest",exs:ar.map((x,i)=>ex("b1"+(i+1),"💪",x[0],as,x[1],1))}); }
-  const finWk=!!s.fin&&w%2===0;
-  if(!dl&&!finWk) secs.push({lbl:"Core · superset",exs:[ex("b8","🧱",core[0][0],core[0][1]),ex("b9","🧱",core[1][0],core[1][1])]});
-  if(finWk) secs.push({lbl:fin.t+" · core moves to next week",fin:true,rounds:s.fin,cs:fin.cs});
-  z2=15; secs.push({lbl:"Z2 flush run",exs:[ex("b10","🏃","Easy run",z2+" min","@ {E} · conversational · treadmill fine")]});
-  return {tag:"upper",muscles:"Lats · Upper back · Rear delts · Chest · Shoulders · Biceps · Triceps · Glutes · Hamstrings · Grip · Core",dur:{found:"60 min",build:"60 min",heavy:"60 min",maint:"55 min",deload:"50 min",taper:"40 min"}[lv],int:dl?55:80,mac:"str",name:"Strength B",title:"Strength B — Upper + Posterior · Z2",secs,km:+(z2/7).toFixed(1),kcal:(dl?250:400)+z2*9};
+   {lbl:"Block 1 · superset pull + push · rest "+s.rest,exs:[ex("b1","💪",U.pu[0],s.m,s.rpe+" · "+U.pu[1],1),ex("b2","💪",U.pr[0],s.m,U.pr[1],1)]},
+   {lbl:"Block 2 · superset row + overhead · rest "+s.rest,exs:[ex("b3","💪",U.rw[0],s.h,U.rw[1],1),...(lv==="taper"?[]:[ex("b4","💪",U.oh[0],s.h,U.oh[1],1)])]}];
+  if(s.a) secs.push({lbl:"Block 3 · superset · 60s rest",exs:[ex("b5","🍑",po[0],s.a,po[1],!!po[2]),...(dl?[]:[ex("b6","🧱",core[0],core[1])])]});
+  if(s.a&&lv!=="deload") secs.push({lbl:"Block 4 · superset · 45s rest",exs:ar.map((x,i)=>ex("b7"+i,"💪",x[0],s.a,x[1],1))});
+  secs.push({lbl:"Optional · Z2 flush",exs:[ex("b10","🏃","Easy run","10–15 min","@ {E} · skip if short on time")]});
+  return {tag:"upper",muscles:"Lats · Upper back · Chest · Shoulders · Rear delts · Arms · Glutes / hamstrings · Core",
+    dur:{found:"50 min",build:"50 min",heavy:"55 min",maint:"45 min",deload:"40 min",taper:"30 min"}[lv],
+    int:dl?55:80,mac:"str",name:"Strength B",title:"Strength B — Upper + Posterior",secs,km:2,kcal:dl?250:380};
 }
 function tueRun(t){ return {tag:"run",dur:Math.min(60,(t.tm||35)+17)+" min",int:86,mac:"hard",tip:"Early session? 20–30g fast carbs before (banana / rice cakes + honey)",
   name:t.n,title:t.n+" — "+t.s,km:t.km,kcal:Math.round(t.km*61),secs:[

@@ -1,5 +1,5 @@
 // Backyard Ultra — offline cache. Bump VERSION whenever you upload a new index.html.
-const VERSION = "backyard-v5";
+const VERSION = "backyard-v7";
 const ASSETS = ["./", "./index.html", "./manifest.json", "./icon-192.png", "./icon-512.png", "./icon-maskable-512.png", "./apple-touch-icon.png"];
 
 self.addEventListener("install", e => {
