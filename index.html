@@ -91,15 +91,24 @@ const WK={
 const wNote=w=>({h:WK[w].h,rpe:w===23?"Fresh":w===17?"Light":RPE[WK[w].str]});
 
 // ── macros by day type (61.2 kg · protein anchored · carbs are the lever) ──
+// Energy model: ~2,150 kcal/day baseline (BMR 1,524 + office job + ~10k steps + digestion)
+// + session cost. Running ≈ 0.9 kcal/kg/km net ≈ 55 kcal/km at 61 kg. Lifting ≈ 200–270 net. HIIT ≈ 9 kcal/min.
+const BASE=2150, RUN_K=55;
 const MAC={
-  rest:{k:2150,p:145,c:240,f:65,l:"Rest day"},
-  str:{k:2450,p:145,c:320,f:65,l:"Strength day"},
-  hard:{k:2600,p:145,c:360,f:65,l:"HIIT / quality run"},
-  sun:{k:2500,p:140,c:335,f:65,l:"Sunday Z2 / back-to-back"},
-  long:{k:3050,p:140,c:460,f:70,l:"Long run 14–25 km"},
-  yard:{k:3700,p:140,c:625,f:75,l:"Yard sim 27–40 km"},
-  load:{k:3100,p:120,c:550,f:50,l:"Carb-load day"},
+  rest:{k:2150,p:145,c:245,f:65,l:"Rest day"},
+  str:{k:2400,p:145,c:320,f:60,l:"Strength day"},
+  hard:{k:2600,p:145,c:370,f:60,l:"Quality run / HIIT"},
+  sun:{k:2500,p:140,c:350,f:60,l:"Sunday Z2 / back-to-back"},
+  long:{l:"Long run · 14–25 km"},
+  yard:{l:"Yard sim / race"},
+  load:{k:3100,p:120,c:550,f:50,l:"Carb-load day (race week)"},
 };
+const r50=x=>Math.round(x/50)*50;
+function longMac(km,l){ const k=r50(BASE+km*RUN_K), p=140, f=70; return {k,p,f,c:Math.round((k-p*4-f*9)/4),l}; }
+function macFor(day){ const m=MAC[day.mac]; if(!m) return null;
+  if((day.mac==="long"||day.mac==="yard"||day.tag==="long")&&day.km) return longMac(day.km,(day.tag==="long"&&day.mac==="sun"?"Back-to-back":m.l.split(" · ")[0])+" · "+day.km+" km");
+  return m.k?m:null; }
+
 
 // ── paces from 10k time ──
 const DEF10K=55*60;
@@ -168,7 +177,7 @@ function strA(lv,w){ const s=SETS[lv], dl=lv==="deload"||lv==="taper", L=LOWER[P
   if(lv==="found"||lv==="build") secs.push({lbl:FORT(FINA,w).t,fin:true,rounds:"3 rounds",cs:FORT(FINA,w).cs});
   return {tag:"lower",muscles:"Quads · Glutes · Glute med · Hamstrings · Adductors · Calves · Shins · Core",
     dur:{found:"50 min",build:"50 min",heavy:"55 min",maint:"45 min",deload:"40 min",taper:"25 min"}[lv],
-    int:dl?55:lv==="heavy"?90:82,mac:"str",tip:"Meal with carbs + protein 2–3h before · 30–40g protein + carbs within 2h after",name:"Strength A",title:"Strength A — Lower",secs,km:0,kcal:dl?250:400};
+    int:dl?55:lv==="heavy"?90:82,mac:"str",tip:"Meal with carbs + protein 2–3h before · 30–40g protein + carbs within 2h after",name:"Strength A",title:"Strength A — Lower",secs,km:0,kcal:dl?170:250};
 }
 function strB(lv,z2,w){ const s=SETS[lv], dl=lv==="deload"||lv==="taper", U=UPPER[PH(w)], po=FORT(POSTB,w), core=FORT(COREB,w), ar=FORT(ARMS,w);
   const secs=[
@@ -180,10 +189,10 @@ function strB(lv,z2,w){ const s=SETS[lv], dl=lv==="deload"||lv==="taper", U=UPPE
   secs.push({lbl:"Optional · Z2 flush",exs:[ex("b10","🏃","Easy run","10–15 min","@ {E} · skip if short on time")]});
   return {tag:"upper",muscles:"Lats · Upper back · Chest · Shoulders · Rear delts · Arms · Glutes / hamstrings · Core",
     dur:{found:"50 min",build:"50 min",heavy:"55 min",maint:"45 min",deload:"40 min",taper:"30 min"}[lv],
-    int:dl?55:80,mac:"str",tip:"Meal with carbs + protein 2–3h before · 30–40g protein + carbs within 2h after",name:"Strength B",title:"Strength B — Upper + Posterior",secs,km:2,kcal:dl?250:380};
+    int:dl?55:80,mac:"str",tip:"Meal with carbs + protein 2–3h before · 30–40g protein + carbs within 2h after",name:"Strength B",title:"Strength B — Upper + Posterior",secs,km:0,kcal:dl?160:230};
 }
 function tueRun(t){ return {tag:"run",dur:Math.min(60,(t.tm||35)+17)+" min",int:86,mac:"hard",tip:"Early session? 20–30g fast carbs before (banana / rice cakes + honey)",
-  name:t.n,title:t.n+" — "+t.s,km:t.km,kcal:Math.round(t.km*61),secs:[
+  name:t.n,title:t.n+" — "+t.s,km:t.km,kcal:Math.round(t.km*RUN_K),secs:[
   {lbl:"Warm-Up · 12 min",exs:[ex("t0","🏃","Easy jog","8 min","@ {E}"),ex("t1","⚡","Drills: A-skips · high knees · butt kicks","2×20m"),ex("t2","💨","Strides","4×80m","Build to rep pace")]},
   {lbl:"Main set",exs:[ex("t3","🎯",t.n,t.s,t.note)]},
   {lbl:"Cool-Down · 5 min",exs:[ex("t4","🚶","Easy jog + stretch","5 min","@ {E}")]}]}; }
@@ -199,7 +208,7 @@ function hiit(w,mins){ const f=(w-1)%8; let title,rounds,cs,lbl,km=0;
   else if(f===6){ rounds=7; title="Erg Pyramid"; lbl="1-2-3-4-3-2-1 min hard · equal rest · rotate row → ski → bike"; cs=[{n:"1 min",v:"hard"},{n:"2 min",v:"hard"},{n:"3 min",v:"hard"},{n:"4 min",v:"hard"},{n:"3 min",v:"hard"},{n:"2 min",v:"hard"},{n:"1 min",v:"all out"}]; }
   else { rounds=3; title="21-15-9"; lbl="21-15-9 reps · 400m run after each round · for time"; km=1.2; cs=[{n:"DB thrusters @ 2×8kg",v:"21-15-9"},{n:"Burpees",v:"21-15-9"},{n:"Bike",v:"21-15-9 cal"},{n:"Run",v:"400m"}]; }
   return {tag:"hybrid",muscles:"Full body · Engine · Lactate tolerance",dur:(mins+15)+" min",int:mins>=36?95:mins>=30?90:80,mac:"hard",tip:"Biggest calorie burn of the week — carbs before and after",
-    name:title,title:"HIIT Engine — "+title,km:+km.toFixed(1),kcal:mins*12+120,secs:[
+    name:title,title:"HIIT Engine — "+title,km:+km.toFixed(1),kcal:mins*9+60,secs:[
     {lbl:"Warm-Up · 8 min",exs:[ex("h0","🚣","Row easy","4 min"),ex("h1","🔄","Inchworms · leg swings · 10 air squats","1 round"),ex("h2","⚡","Primer: 1 slow round of the circuit","1×")]},
     {lbl,fin:true,rounds:rounds+" rounds",cs},
     {lbl:"Cool-Down",exs:[ex("h3","🚶","Walk / easy bike + stretch","6 min","Log time or reps in notes")]}]}; }
@@ -214,10 +223,10 @@ function satRun(w,s){
         ex("l4","💧","Fluids + sodium","400–800 ml/h","300–600 mg sodium per hour")]},
       fuelSec(w),
       {lbl:"After",exs:[ex("l5","🥛","Protein + carbs within 1h","30–40g P"),ex("l6","🧘","Mobility: hips · calves · T-spine","10 min")]}];
-    return {tag:"long",dur:Math.round(s.km*6.9)+" min",int:s.km>=24?88:78,mac:"long",name:"Long Run",title:"Long Run — "+s.km+" km",secs,km:s.km,kcal:Math.round(s.km*61)}; }
+    return {tag:"long",dur:Math.round(s.km*6.9)+" min",int:s.km>=24?88:78,mac:"long",name:"Long Run",title:"Long Run — "+s.km+" km",secs,km:s.km,kcal:Math.round(s.km*RUN_K)}; }
   if(s.t==="yards"){ const km=+(s.y*YARD).toFixed(1); return {tag:"long",peak:!!s.peak,dur:s.y+" h",int:s.peak?98:90,mac:"yard",
     tip:"50–70g carbs per yard · eat in the first 3 min of each break",
-    name:s.peak?"PEAK SIM":"Yard Sim",title:(s.peak?"PEAK SIM — ":"Yard Sim — ")+s.y+" yards ("+km+" km) "+(s.peak?"🔥":""),km,kcal:Math.round(km*61),secs:[
+    name:s.peak?"PEAK SIM":"Yard Sim",title:(s.peak?"PEAK SIM — ":"Yard Sim — ")+s.y+" yards ("+km+" km) "+(s.peak?"🔥":""),km,kcal:Math.round(km*RUN_K),secs:[
     {lbl:"Set-up",exs:[ex("y0","📍","Pick a 6.7 km loop near home","—","Start/finish at your door = your 'corral' with food + kit"),
       ex("y1","⏰","Start every yard on the hour","—","Set an hourly alarm · never start late")]},
     {lbl:"Yards — start each one on the hour",yards:s.y},
@@ -226,7 +235,7 @@ function satRun(w,s){
       ex("y4","🧦","Feet check at yard 3","—","Lube, sock change, hot spots taped early"),
       ex("y5","🧠","Practise the restart","—","The hardest skill: standing up at the bell when you don't want to")]},
     fuelSec(w)]}; }
-  if(s.t==="tt"){ return {tag:"long",ttDay:true,dur:"~2h",int:96,mac:"long",tip:"Treat it like a race — carb-rich dinner Friday",name:"Half Marathon TT",title:"Half Marathon Time Trial 🎯",km:21.1,kcal:1290,secs:[
+  if(s.t==="tt"){ return {tag:"long",ttDay:true,dur:"~2h",int:96,mac:"long",tip:"Treat it like a race — carb-rich dinner Friday",name:"Half Marathon TT",title:"Half Marathon Time Trial 🎯",km:21.1,kcal:1160,secs:[
     {lbl:"Warm-Up",exs:[ex("tt0","🏃","Easy jog","10 min","@ {E}"),ex("tt1","💨","Strides","3×80m")]},
     {lbl:"Time trial",exs:[ex("tt2","🎯","Half marathon — even effort","21.1 km","Start @ {HM} · speed up after 15 km only if you can"),ex("tt3","🍬","Gel at 45 + 90 min","2×25g")]},
     {lbl:"Re-set your paces",tt:true}]}; }
@@ -234,15 +243,15 @@ function satRun(w,s){
 }
 function sunRun(w,s){
   if(s.t==="z2"){ s={...s,km:Math.min(s.km,8.5)}; } 
-  if(s.t==="z2") return {tag:"run",dur:Math.min(60,Math.round(s.km*7))+" min",int:45,mac:"sun",optional:!!s.opt,name:"Z2 Run",title:"Z2 Run — "+s.km+" km"+(s.opt?" · Optional":""),km:s.km,kcal:Math.round(s.km*61),
+  if(s.t==="z2") return {tag:"run",dur:Math.min(60,Math.round(s.km*7))+" min",int:45,mac:"sun",optional:!!s.opt,name:"Z2 Run",title:"Z2 Run — "+s.km+" km"+(s.opt?" · Optional":""),km:s.km,kcal:Math.round(s.km*RUN_K),
     tip:s.opt?"Skip if WHOOP recovery is low":"",secs:[{lbl:"Aerobic",exs:[ex("s0","🏃","Easy run",s.km+" km","@ {E} · nose-breathing easy")]},{lbl:"Mobility",exs:[ex("s1","🧘","Hips · calves · T-spine","10 min")]}]};
-  if(s.t==="b2b"){ const km=+(s.y*YARD).toFixed(1); return {tag:"long",dur:s.y+" h",int:70,mac:"sun",name:"Back-to-Back",title:"Back-to-Back — "+s.y+" yard"+(s.y>1?"s":"")+" on tired legs",km,kcal:Math.round(km*61),
+  if(s.t==="b2b"){ const km=+(s.y*YARD).toFixed(1); return {tag:"long",dur:s.y+" h",int:70,mac:"sun",name:"Back-to-Back",title:"Back-to-Back — "+s.y+" yard"+(s.y>1?"s":"")+" on tired legs",km,kcal:Math.round(km*RUN_K),
     tip:"Breakfast 2h before · same fuel as Saturday",secs:[{lbl:"Yards — on the hour",yards:s.y},{lbl:"Focus",exs:[ex("s2","🐢","Yard pace, even when it feels slow","@ {Y}","This teaches the legs to keep going on day 2")]}]}; }
-  if(s.t==="walk") return {tag:"run",dur:"40 min",int:20,mac:"sun",optional:true,name:"Recovery",title:"Recovery Walk — Optional",km:3,kcal:180,
+  if(s.t==="walk") return {tag:"run",dur:"40 min",int:20,mac:"sun",optional:true,name:"Recovery",title:"Recovery Walk — Optional",km:3,kcal:160,
     tip:"Eat well — Saturday was huge",secs:[{lbl:"Recover",exs:[ex("s3","🚶","Easy walk","30–40 min"),ex("s4","🧘","Mobility + foam roll","15 min")]}]};
 }
 const REST={tag:"rest",rest:true,int:12,mac:"rest",name:"Rest",title:"Rest & Recovery",km:0,kcal:0};
-function hotelCircuit(){ return {tag:"hybrid",dur:"35 min",int:70,mac:"hard",name:"Hotel Gym",title:"Hotel Gym Circuit 🌴",km:0,kcal:380,tip:"Holiday eating is fine — keep protein at each meal",secs:[
+function hotelCircuit(){ return {tag:"hybrid",dur:"35 min",int:70,mac:"hard",name:"Hotel Gym",title:"Hotel Gym Circuit 🌴",km:0,kcal:250,tip:"Holiday eating is fine — keep protein at each meal",secs:[
   {lbl:"Warm-Up",exs:[ex("hc0","🏃","Treadmill or bike easy","5 min")]},
   {lbl:"4–5 rounds · 60s rest",fin:true,rounds:"5 rounds",cs:[{n:"DB goblet squat",v:"15"},{n:"Push-ups",v:"12"},{n:"DB row",v:"12/arm"},{n:"Walking lunges",v:"20"},{n:"Treadmill / bike hard",v:"60s"}]}]}; }
 
@@ -250,30 +259,30 @@ function getDays(w){
   let d;
   const k=WK[w];
   if(w===17){ d=[
-      {tag:"run",dur:"50 min",int:60,mac:"hard",name:"Easy + Strides",title:"Easy Run + Strides — before you fly",km:8,kcal:490,secs:[{lbl:"Run",exs:[ex("v0","🏃","Easy run","8 km","@ {E}"),ex("v1","💨","Strides","6×20s","Relaxed fast")]}]},
+      {tag:"run",dur:"50 min",int:60,mac:"hard",name:"Easy + Strides",title:"Easy Run + Strides — before you fly",km:8,kcal:440,secs:[{lbl:"Run",exs:[ex("v0","🏃","Easy run","8 km","@ {E}"),ex("v1","💨","Strides","6×20s","Relaxed fast")]}]},
       strA("maint",17),
       {...REST,title:"Travel day ✈️",restNote:"Hydrate on the flight · walk the airport · sleep when you can"},
       hotelCircuit(),
-      {tag:"run",dur:"45–60 min",int:50,mac:"sun",name:"Easy Run",title:"Easy Run — early, before the heat",km:8,kcal:490,tip:"Electrolytes — it's hot and humid",secs:[{lbl:"Run",exs:[ex("v2","🏃","Easy run / treadmill","45–60 min","@ {E} · slower in the heat is correct")]}]},
-      {tag:"run",dur:"30 min",int:30,mac:"rest",optional:true,name:"Swim / Mobility",title:"Swim or Mobility — Optional",km:0,kcal:200,secs:[{lbl:"Move",exs:[ex("v3","🏊","Swim, snorkel or mobility","30 min","Holiday — enjoy it")]}]}, {...REST}]; }
+      {tag:"run",dur:"45–60 min",int:50,mac:"sun",name:"Easy Run",title:"Easy Run — early, before the heat",km:8,kcal:440,tip:"Electrolytes — it's hot and humid",secs:[{lbl:"Run",exs:[ex("v2","🏃","Easy run / treadmill","45–60 min","@ {E} · slower in the heat is correct")]}]},
+      {tag:"run",dur:"30 min",int:30,mac:"rest",optional:true,name:"Swim / Mobility",title:"Swim or Mobility — Optional",km:0,kcal:180,secs:[{lbl:"Move",exs:[ex("v3","🏊","Swim, snorkel or mobility","30 min","Holiday — enjoy it")]}]}, {...REST}]; }
   else if(w===18){ d=[
-      {tag:"run",dur:"30 min",int:40,mac:"sun",optional:true,name:"Easy Run",title:"Easy Run — Optional",km:5,kcal:300,secs:[{lbl:"Run",exs:[ex("v4","🏃","Easy run / treadmill","30 min","@ {E}")]}]},
+      {tag:"run",dur:"30 min",int:40,mac:"sun",optional:true,name:"Easy Run",title:"Easy Run — Optional",km:5,kcal:275,secs:[{lbl:"Run",exs:[ex("v4","🏃","Easy run / treadmill","30 min","@ {E}")]}]},
       hotelCircuit(),
       {...REST,title:"Travel day ✈️",restNote:"Home tonight · hydrate · normal meals"},
       strB("maint",20,18), satRun(18,{t:"long",km:18}), sunRun(18,{t:"z2",km:8}), {...REST}]; }
   else if(w===23){ const g=+(DATA.goal||6);
     d=[ {...strA("taper",23),title:"Strength A — Taper Touch",dur:"25 min"},
-      {tag:"run",dur:"35 min",int:55,mac:"hard",name:"Openers",title:"Openers — 4×400m",km:6,kcal:370,secs:[
+      {tag:"run",dur:"35 min",int:55,mac:"hard",name:"Openers",title:"Openers — 4×400m",km:6,kcal:330,secs:[
         {lbl:"Warm-Up",exs:[ex("o0","🏃","Easy jog","10 min","@ {E}"),ex("o1","💨","Strides","3×80m")]},
         {lbl:"Openers",exs:[ex("o2","🎯","400m repeats","4×400m","@ {R} · 2 min walk · crisp, not hard")]},
         {lbl:"Cool-Down",exs:[ex("o3","🚶","Easy jog","5 min")]}]},
-      {tag:"run",dur:"30 min",int:30,mac:"str",name:"Easy Run",title:"Easy Run + Mobility",km:4,kcal:250,secs:[{lbl:"Easy",exs:[ex("o4","🏃","Easy run","25 min","@ {E}"),ex("o5","🧘","Mobility","10 min")]}]},
+      {tag:"run",dur:"30 min",int:30,mac:"str",name:"Easy Run",title:"Easy Run + Mobility",km:4,kcal:220,secs:[{lbl:"Easy",exs:[ex("o4","🏃","Easy run","25 min","@ {E}"),ex("o5","🧘","Mobility","10 min")]}]},
       {...REST,mac:"load",title:"Carb-Load Day 1 · Rest",restNote:"8–10 g/kg carbs today and tomorrow (~500–600g) · familiar foods · the scale will go up — that's fuel"},
-      {tag:"run",dur:"20 min",int:25,mac:"load",name:"Shakeout",title:"Shakeout + Race Admin",km:3,kcal:180,tip:"Low-fibre today · early dinner · nothing new",secs:[
+      {tag:"run",dur:"20 min",int:25,mac:"load",name:"Shakeout",title:"Shakeout + Race Admin",km:3,kcal:165,tip:"Low-fibre today · early dinner · nothing new",secs:[
         {lbl:"Shakeout",exs:[ex("o6","🏃","Easy jog","15 min"),ex("o7","💨","Strides","3×60m")]},
         {lbl:"Pack the corral",exs:[ex("o8","🎒","Chair, cool box, food per yard (labelled)","—"),ex("o9","🔦","Head torch + spare batteries","—","You may run into the night"),
           ex("o10","🧦","3 pairs socks · 2nd shoes · lube · tape · blister kit","—"),ex("o11","🧥","Warm layers + waterproof","—","Brighton wind at night"),ex("o12","😴","Early night","8h+")]}]},
-      {tag:"long",race:true,dur:"until you stop",int:100,mac:"yard",name:"RACE DAY",title:"RACE DAY — BRIGHTON BACKYARD 🏁",km:+(g*YARD).toFixed(1),kcal:Math.round(g*YARD*61),
+      {tag:"long",race:true,dur:"until you stop",int:100,mac:"yard",name:"RACE DAY",title:"RACE DAY — BRIGHTON BACKYARD 🏁",km:+(g*YARD).toFixed(1),kcal:Math.round(g*YARD*RUN_K),
         tip:"Breakfast 3h before (80–100g carbs) · 50–70g carbs per yard · salty food from yard 4 · save caffeine for later yards",secs:[
         {lbl:"Race plan — tick as you commit",exs:[ex("r1","🐢","Yard 1 is the warm-up","—","Slowest yard of the day"),
           ex("r2","⏱","Finish every yard in 48–52 min","@ {Y}","Same every hour — no banking"),
@@ -333,7 +342,7 @@ function bar(v,c){return `<div style="height:4px;background:rgba(255,255,255,.06
 const lblS=`font-family:${F.mono};font-size:9px;color:${C.muted};letter-spacing:.1em;text-transform:uppercase`;
 const inpS=`background:${C.bg};border:1px solid ${C.border};border-radius:7px;padding:6px 6px;color:${C.text};font-size:12px;text-align:center;outline:none`;
 
-function macroStrip(day){ const m=MAC[day.mac]; if(!m&&!day.tip) return "";
+function macroStrip(day){ const m=macFor(day); if(!m&&!day.tip) return "";
   return `<div style="background:${A(C.orange,.05)};border:1px solid ${A(C.orange,.16)};border-radius:8px;padding:7px 10px;margin-bottom:12px;font-size:11px;color:${C.orange};line-height:1.55">
     ${m?`🍽️ <b>${m.l}</b> · ~${m.k.toLocaleString("en-GB")} kcal · P ${m.p}g · C ${m.c}g · F ${m.f}g`:""}
     ${day.tip?`<div style="color:${C.muted};margin-top:${m?2:0}px">${e(day.tip)}</div>`:""}</div>`; }
@@ -486,12 +495,18 @@ function fuel(){
     h+=`<div data-act="fuel" data-v="${id}" style="flex:1;padding:8px 2px;border-radius:8px;background:${on?C.orange:"transparent"};color:${on?C.ink:C.muted};font-family:${F.mono};font-size:9px;font-weight:${on?700:400};cursor:pointer;white-space:nowrap;text-align:center">${l}</div>`; });
   h+=`</div>`;
   if(S.fuel==="days"){
-    h+=box(`Set at roughly <b style="color:${C.text}">maintenance</b> — enough to build muscle while the mileage climbs. You're at 12.7% body fat; definition comes from muscle gain at a steady fat %, not a further cut. Averages ≈ <b style="color:${C.text}">2,500 kcal/day</b> on a normal week, ≈ 2,800 at peak.`);
+    const avg=w=>r50(getDays(w).reduce((s,d)=>{const m=macFor(d);return s+(m?m.k:(d.rest?MAC.rest.k:MAC.str.k));},0)/7);
+    h+=box(`Set at roughly <b style="color:${C.text}">maintenance</b>: a ~2,150 kcal baseline (BMR 1,524 + office day + ~10k steps) plus what each session burns. Weekly average ≈ <b style="color:${C.text}">${avg(1).toLocaleString("en-GB")} kcal/day</b> in Wk 1, ≈ ${avg(20).toLocaleString("en-GB")} in the peak week.`);
     h+=SH("Targets by day type",C.orange);
-    Object.values(MAC).forEach(m=>{ h+=`<div style="background:${C.card};border-radius:9px;padding:10px 12px;margin-bottom:6px">
+    const card=(m,sub)=>`<div style="background:${C.card};border-radius:9px;padding:10px 12px;margin-bottom:6px">
       <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:12.5px;color:${C.text};font-weight:600">${m.l}</span><span style="font-family:${F.disp};font-size:17px;color:${C.orange}">~${m.k.toLocaleString("en-GB")}</span></div>
-      <div style="display:flex;gap:12px;margin-top:4px;font-family:${F.mono};font-size:11px;color:${C.muted}"><span>P <b style="color:${C.text}">${m.p}g</b></span><span>C <b style="color:${C.text}">${m.c}g</b> (${(m.c/BODY_KG).toFixed(1)} g/kg)</span><span>F <b style="color:${C.text}">${m.f}g</b></span></div></div>`; });
-    h+=`<div style="font-size:10.5px;color:${C.muted};margin-top:8px;line-height:1.5">Long-run and yard-sim totals include what you eat during the run. Estimates from your 5 Nov InBody (61.2 kg · BMR 1524) — starting points, adjust with the Enough? tab.</div>`;
+      <div style="display:flex;gap:12px;margin-top:4px;font-family:${F.mono};font-size:11px;color:${C.muted}"><span>P <b style="color:${C.text}">${m.p}g</b></span><span>C <b style="color:${C.text}">${m.c}g</b> (${(m.c/BODY_KG).toFixed(1)} g/kg)</span><span>F <b style="color:${C.text}">${m.f}g</b></span></div>${sub?`<div style="font-size:10.5px;color:${C.muted};margin-top:4px">${sub}</div>`:""}</div>`;
+    ["rest","str","hard","sun"].forEach(k=>h+=card(MAC[k]));
+    h+=card(longMac(16,"Long run · e.g. 16 km"),"Scales with distance: 2,150 + ~55 kcal per km — the session card shows your exact number");
+    h+=card(longMac(26.8,"Yard sim · e.g. 4 yards (26.8 km)"));
+    h+=card(longMac(40.2,"Peak sim · 6 yards (40.2 km)"),"Includes 60–75g carbs/hour eaten during the run");
+    h+=card(MAC.load);
+    h+=`<div style="font-size:10.5px;color:${C.muted};margin-top:8px;line-height:1.5">Session burns: running ≈ 55 kcal/km · lifting ≈ 200–270 · HIIT ≈ 9 kcal/min. Wearables read lifting very low (heart rate stays down) and intervals a bit low. Estimates from your 5 Nov InBody (61.2 kg · BMR 1,524) — adjust with the Enough? tab.</div>`;
   } else if(S.fuel==="around"){
     h+=SH("Quality runs + HIIT");
     [["3h before (ideal)","60–90g carbs + 20–30g protein · low fat/fibre — oats + banana + honey, bagel + jam + Greek yogurt"],["Early, no time","20–30g fast carbs 15–30 min before: banana, rice cakes + honey, juice"],["45–60 min before","Coffee if you like it"],["The real lever","Carb-rich dinner the night before"]].forEach(([k,v])=>h+=row(k,v,C.lime));
