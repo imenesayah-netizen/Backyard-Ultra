@@ -168,7 +168,7 @@ function strA(lv,w){ const s=SETS[lv], dl=lv==="deload"||lv==="taper", L=LOWER[P
   if(lv==="found"||lv==="build") secs.push({lbl:FORT(FINA,w).t,fin:true,rounds:"3 rounds",cs:FORT(FINA,w).cs});
   return {tag:"lower",muscles:"Quads · Glutes · Glute med · Hamstrings · Adductors · Calves · Shins · Core",
     dur:{found:"50 min",build:"50 min",heavy:"55 min",maint:"45 min",deload:"40 min",taper:"25 min"}[lv],
-    int:dl?55:lv==="heavy"?90:82,mac:"str",name:"Strength A",title:"Strength A — Lower",secs,km:0,kcal:dl?250:400};
+    int:dl?55:lv==="heavy"?90:82,mac:"str",tip:"Meal with carbs + protein 2–3h before · 30–40g protein + carbs within 2h after",name:"Strength A",title:"Strength A — Lower",secs,km:0,kcal:dl?250:400};
 }
 function strB(lv,z2,w){ const s=SETS[lv], dl=lv==="deload"||lv==="taper", U=UPPER[PH(w)], po=FORT(POSTB,w), core=FORT(COREB,w), ar=FORT(ARMS,w);
   const secs=[
@@ -180,7 +180,7 @@ function strB(lv,z2,w){ const s=SETS[lv], dl=lv==="deload"||lv==="taper", U=UPPE
   secs.push({lbl:"Optional · Z2 flush",exs:[ex("b10","🏃","Easy run","10–15 min","@ {E} · skip if short on time")]});
   return {tag:"upper",muscles:"Lats · Upper back · Chest · Shoulders · Rear delts · Arms · Glutes / hamstrings · Core",
     dur:{found:"50 min",build:"50 min",heavy:"55 min",maint:"45 min",deload:"40 min",taper:"30 min"}[lv],
-    int:dl?55:80,mac:"str",name:"Strength B",title:"Strength B — Upper + Posterior",secs,km:2,kcal:dl?250:380};
+    int:dl?55:80,mac:"str",tip:"Meal with carbs + protein 2–3h before · 30–40g protein + carbs within 2h after",name:"Strength B",title:"Strength B — Upper + Posterior",secs,km:2,kcal:dl?250:380};
 }
 function tueRun(t){ return {tag:"run",dur:Math.min(60,(t.tm||35)+17)+" min",int:86,mac:"hard",tip:"Early session? 20–30g fast carbs before (banana / rice cakes + honey)",
   name:t.n,title:t.n+" — "+t.s,km:t.km,kcal:Math.round(t.km*61),secs:[
@@ -493,12 +493,16 @@ function fuel(){
       <div style="display:flex;gap:12px;margin-top:4px;font-family:${F.mono};font-size:11px;color:${C.muted}"><span>P <b style="color:${C.text}">${m.p}g</b></span><span>C <b style="color:${C.text}">${m.c}g</b> (${(m.c/BODY_KG).toFixed(1)} g/kg)</span><span>F <b style="color:${C.text}">${m.f}g</b></span></div></div>`; });
     h+=`<div style="font-size:10.5px;color:${C.muted};margin-top:8px;line-height:1.5">Long-run and yard-sim totals include what you eat during the run. Estimates from your 5 Nov InBody (61.2 kg · BMR 1524) — starting points, adjust with the Enough? tab.</div>`;
   } else if(S.fuel==="around"){
-    h+=SH("Before");
-    [["Hard + early","20–30g fast carbs: banana, rice cakes + honey, juice"],["Easy runs","Can stay fasted if you feel good"],["Early long runs","30–40g fast carbs 15–30 min before · start fuelling at 30 min"],["Later long runs","Breakfast 2–3h before · 60–90g carbs"],["Race rehearsal","2–3 yard sims with your real race breakfast, 3h before"],["The real lever","Carb-rich dinner the night before hard days"]].forEach(([k,v])=>h+=row(k,v,C.lime));
-    h+=SH("After");
+    h+=SH("Quality runs + HIIT");
+    [["3h before (ideal)","60–90g carbs + 20–30g protein · low fat/fibre — oats + banana + honey, bagel + jam + Greek yogurt"],["Early, no time","20–30g fast carbs 15–30 min before: banana, rice cakes + honey, juice"],["45–60 min before","Coffee if you like it"],["The real lever","Carb-rich dinner the night before"]].forEach(([k,v])=>h+=row(k,v,C.lime));
+    h+=SH("Strength days");
+    [["2–3h before","Normal meal: 40–60g carbs + 25–30g protein"],["Or 60 min before","Greek yogurt + fruit, or toast + eggs"],["Fasted?","OK for an early session, but have protein + carbs straight after"],["During","Water · nothing else needed under 60 min"],["After","30–40g protein + carbs within 2h — the muscle-building window that matters most"],["Optional","Creatine monohydrate 3–5g daily, any time — the best-evidenced supplement for strength"]].forEach(([k,v])=>h+=row(k,v,C.lime));
+    h+=SH("Long runs");
+    [["Early start","30–40g fast carbs 15–30 min before · start fuelling at 30 min"],["Later start","Breakfast 2–3h before · 60–90g carbs"],["Race rehearsal","2–3 yard sims with your real race breakfast, 3h before"]].forEach(([k,v])=>h+=row(k,v,C.lime));
+    h+=SH("After any session");
     [["Within 1–2h","30–40g protein + carbs"],["Overnight oats","Still perfect post-session (65g C · 41g P)"]].forEach(([k,v])=>h+=row(k,v,C.lime));
     h+=SH("Through the day");
-    [["Protein spread","~4 × 35g meals — lunch included (≥35g keeps the afternoon hunger down)"],["Big dinner","Fine — put most of the carbs there before hard mornings"],["Hydration","Water all day · electrolytes on sweaty sessions"]].forEach(([k,v])=>h+=row(k,v,C.lime));
+    [["Protein spread","~4 × 35g meals — lunch included (≥35g keeps the afternoon hunger down)"],["Fat","50g is the floor — oily fish 2×/week, eggs, olive oil, nuts"],["Big dinner","Fine — put most of the carbs there before hard mornings"],["Hydration","Water all day · electrolytes on sweaty sessions"]].forEach(([k,v])=>h+=row(k,v,C.lime));
   } else if(S.fuel==="long"){
     h+=box(`Your gut is trainable. Log every long run and yard sim in the session's fuel log — by May you want <b style="color:${C.text}">60–75g carbs/hour</b> to feel boring.`,C.lime);
     h+=SH("Carbs per hour — progression");
